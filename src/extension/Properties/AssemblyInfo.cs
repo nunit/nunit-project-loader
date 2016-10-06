@@ -23,5 +23,5 @@ using System.Runtime.InteropServices;
 [assembly: Guid("6e520555-91a4-427d-8416-b0689e535cc9")]
 
 // Set the version of the extension
-[assembly: AssemblyVersion("3.5.0.0")]
-[assembly: AssemblyFileVersion("3.5.0.0")]
+[assembly: AssemblyVersion("3.6.0.0")]
+[assembly: AssemblyFileVersion("3.6.0.0")]
