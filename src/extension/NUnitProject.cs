@@ -31,17 +31,23 @@ namespace NUnit.Engine.Services.ProjectLoaders
 {
     public class NUnitProject : IProject
     {
-        #region Instance Fields
+        private const string ROOT_NODE = "NUnitProject";
+        private const string SETTINGS_NODE = "Settings";
+        private const string CONFIG_NODE = "Config";
+        private const string ASSEMBLY_NODE = "assembly";
 
-        /// <summary>
-        /// The XmlDocument representing the loaded doc. It
-        /// is generated from the text when the doc is loaded
-        /// unless an exception is thrown. It is modified as the
-        /// user makes changes.
-        /// </summary>
-        XmlDocument xmlDoc = new XmlDocument();
+        private const string ACTIVECONFIG_ATTR = "activeconfig";
+        private const string NAME_ATTR = "name";
+        private const string PATH_ATTR = "path";
+        private const string APPBASE_ATTR = "appbase";
+        private const string CONFIGFILE_ATTR = "configfile";
+        private const string BINPATH_ATTR = "binpath";
+        private const string BINPATHTYPE_ATTR = "binpathtype";
+        private const string RUNTIME_ATTR = "runtimeFramework";
+        private const string PROCESS_ATTR = "processModel";
+        private const string DOMAIN_ATTR = "domainUsage";
 
-        #endregion
+        private const string BINPATH_AUTO = "auto";
 
         #region IProject Members
 
@@ -58,16 +64,7 @@ namespace NUnit.Engine.Services.ProjectLoaders
         /// if present and otherwise return the first
         /// config found.
         /// </summary>
-        public string ActiveConfigName
-        {
-            get 
-            { 
-                var activeConfig = GetSetting("activeconfig");
-                if (activeConfig == null && ConfigNodes.Count > 0)
-                    activeConfig = ConfigNodes[0].GetAttribute("name");
-                return activeConfig;
-            }
-        }
+        public string ActiveConfigName { get; private set; }
 
         public IList<string> ConfigNames
         {
@@ -75,7 +72,7 @@ namespace NUnit.Engine.Services.ProjectLoaders
             {
                 var result = new List<string>();
                 foreach (XmlNode node in ConfigNodes)
-                    result.Add(node.GetAttribute("name"));
+                    result.Add(node.GetAttribute(NAME_ATTR));
                 return result; 
             }
         }
@@ -97,9 +94,9 @@ namespace NUnit.Engine.Services.ProjectLoaders
                 
                 string basePath = GetBasePathForConfig(configNode);
 
-                foreach (XmlNode node in configNode.SelectNodes("assembly"))
+                foreach (XmlNode node in configNode.SelectNodes(ASSEMBLY_NODE))
                 {
-                    string assembly = node.GetAttribute("path");
+                    string assembly = node.GetAttribute(PATH_ATTR);
                     if (basePath != null)
                         assembly = Path.Combine(basePath, assembly);
                     package.AddSubPackage(new TestPackage(assembly));
@@ -120,27 +117,17 @@ namespace NUnit.Engine.Services.ProjectLoaders
         public void Load(string filename)
         {
             ProjectPath = NormalizePath(Path.GetFullPath(filename));
-            xmlDoc.Load(ProjectPath);
+
+            var doc = new XmlDocument();
+            doc.Load(ProjectPath);
+            Initialize(doc);
         }
 
         public void LoadXml(string xmlText)
         {
-            xmlDoc.LoadXml(xmlText);
-        }
-
-        public string GetSetting(string name)
-        {
-            return SettingsNode != null
-                ? SettingsNode.GetAttribute(name)
-                : null;
-        }
-
-        public string GetSetting(string name, string defaultValue)
-        {
-            string result = GetSetting(name);
-            return result == null
-                ? defaultValue
-                : result;
+            var doc = new XmlDocument();
+            doc.LoadXml(xmlText);
+            Initialize(doc);
         }
 
         #endregion
@@ -150,43 +137,77 @@ namespace NUnit.Engine.Services.ProjectLoaders
         /// <summary>
         /// The top-level (NUnitProject) node
         /// </summary>
-        internal XmlNode RootNode
-        {
-            get { return xmlDoc.DocumentElement ; }
-        }
+        internal XmlNode RootNode { get; private set; }
 
         /// <summary>
         /// The Settings node if present, otherwise null
         /// </summary>
-        internal XmlNode SettingsNode
-        {
-            get { return RootNode.SelectSingleNode("Settings"); }
-        }
+        internal XmlNode SettingsNode { get; private set; }
 
         /// <summary>
         /// The collection of Config nodes - may be empty
         /// </summary>
-        internal XmlNodeList ConfigNodes
-        {
-            get { return RootNode.SelectNodes("Config"); }
-        }
+        internal XmlNodeList ConfigNodes { get; private set; }
+
+        /// <summary>
+        /// The specified Runtime, or null
+        /// </summary>
+        internal string RuntimeFramework { get; private set; }
+
+        /// <summary>
+        /// The specified process model, or null
+        /// </summary>
+        internal string ProcessModel { get; private set; }
+
+        /// <summary>
+        /// The specified domain usage, or null
+        /// </summary>
+        internal string DomainUsage { get; private set; }
+
+        /// <summary>
+        /// The project base path (Appbase)
+        /// </summary>
+        internal string ProjectBase { get; private set; }
 
         #endregion
 
         #region Helper Methods
 
+        private void Initialize(XmlDocument doc)
+        {
+            RootNode = doc.DocumentElement;
+            SettingsNode = RootNode.SelectSingleNode(SETTINGS_NODE);
+            ConfigNodes = RootNode.SelectNodes(CONFIG_NODE);
+
+            if (SettingsNode != null)
+            {
+                ActiveConfigName = SettingsNode.GetAttribute(ACTIVECONFIG_ATTR);
+                ProcessModel = SettingsNode.GetAttribute(PROCESS_ATTR);
+                DomainUsage = SettingsNode.GetAttribute(DOMAIN_ATTR);
+                ProjectBase = SettingsNode.GetAttribute(APPBASE_ATTR);
+            }
+
+            if (ActiveConfigName == null && ConfigNodes.Count > 0)
+                ActiveConfigName = ConfigNodes[0].GetAttribute(NAME_ATTR);
+
+            if (ProjectBase == null)
+                ProjectBase = Path.GetDirectoryName(ProjectPath);
+            else if (ProjectPath != null)
+                ProjectBase = Path.Combine(Path.GetDirectoryName(ProjectPath), ProjectBase);
+        }
+
         private IEnumerable<string> GetConfigNodeNames()
         {
             foreach (XmlNode node in ConfigNodes)
             {
-                yield return node.GetAttribute("name");            
+                yield return node.GetAttribute(NAME_ATTR);            
             }
         }
 
         private XmlNode GetConfigNode(string name)
         {
             foreach (XmlNode node in ConfigNodes)
-                if (node.GetAttribute("name") == name)
+                if (node.GetAttribute(NAME_ATTR) == name)
                     return node;
 
             var configNodeNames = new List<string>(GetConfigNodeNames()).ToArray();
@@ -198,34 +219,13 @@ namespace NUnit.Engine.Services.ProjectLoaders
             throw new NUnitEngineException(errorMessage + tip);
         }
 
-        /// <summary>
-        /// GetProjectBasePath uses the BasePath if present and otherwise
-        /// defaults to the directory part of the ProjectPath.
-        /// </summary>
-        public string GetProjectBasePath()
-        {
-            string appbase = NormalizePath(GetSetting("appbase"));
-
-            if (ProjectPath == null)
-                return appbase;
-
-            if (appbase == null)
-                return Path.GetDirectoryName(ProjectPath);
-
-            return Path.Combine(
-                Path.GetDirectoryName(ProjectPath),
-                appbase);
-        }
-
         private string GetBasePathForConfig(XmlNode configNode)
         {
-            string projectBasePath = GetProjectBasePath();
-
-            string configBasePath = NormalizePath(configNode.GetAttribute("appbase"));
+            string configBasePath = NormalizePath(configNode.GetAttribute(APPBASE_ATTR));
             if (configBasePath == null)
-                configBasePath = projectBasePath;
-            else if (projectBasePath != null)
-                configBasePath = Path.Combine(projectBasePath, configBasePath);
+                configBasePath = ProjectBase;
+            else if (ProjectBase != null)
+                configBasePath = Path.Combine(ProjectBase, configBasePath);
 
             return configBasePath;
         }
@@ -238,29 +238,27 @@ namespace NUnit.Engine.Services.ProjectLoaders
             if (basePath != ProjectPath)
                 settings[RunnerSettings.BasePath] = basePath;
 
-            string configFile = configNode.GetAttribute("configfile");
+            string configFile = configNode.GetAttribute(CONFIGFILE_ATTR);
             if (configFile != null)
                 settings[RunnerSettings.ConfigurationFile] = configFile;
 
-            string binpath = configNode.GetAttribute("binpath");
+            string binpath = configNode.GetAttribute(BINPATH_ATTR);
             if (binpath != null)
                 settings[RunnerSettings.PrivateBinPath] = binpath;
 
-            string binpathtype = configNode.GetAttribute("binpathtype");
-            if (binpathtype != null && binpathtype.ToLower() == "auto")
+            string binpathtype = configNode.GetAttribute(BINPATHTYPE_ATTR);
+            if (binpathtype != null && binpathtype.ToLower() == BINPATH_AUTO)
                 settings[RunnerSettings.AutoBinPath] = true;
 
-            string runtime = configNode.GetAttribute("runtimeFramework");
+            string runtime = configNode.GetAttribute(RUNTIME_ATTR);
             if (runtime != null)
                 settings[RunnerSettings.RuntimeFramework] = runtime;
 
-            string processModel = GetSetting("processModel");
-            if (processModel != null)
-                settings[RunnerSettings.ProcessModel] = processModel;
+            if (ProcessModel != null)
+                settings[RunnerSettings.ProcessModel] = ProcessModel;
 
-            string domainUsage = GetSetting("domainUsage");
-            if (domainUsage != null)
-                settings[RunnerSettings.DomainUsage] = domainUsage;
+            if (DomainUsage != null)
+                settings[RunnerSettings.DomainUsage] = DomainUsage;
 
             return settings;
         }

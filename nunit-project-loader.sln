@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3B28CF0C-D613-4971-9D8F-00C960C656E2}"
 	ProjectSection(SolutionItems) = preProject
 		build.cake = build.cake
+		nunit-project-loader.nuspec = nunit-project-loader.nuspec
 	EndProjectSection
 EndProject
 Global
