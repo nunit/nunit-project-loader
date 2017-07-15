@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>nunit-extension-nunit-project-loader</id>
+    <version>0.0.0</version>
+    <title>NUnit 3 - NUnit Project Loader Extension</title>
+    <summary>NUnit Engine extension for loading NUnit projects.</summary>
+    <description>This extension allows NUnit to recognize and load NUnit projects, file type .nunit.</description>
+    <projectUrl>http://nunit.org</projectUrl>
+    <projectSourceUrl>https://github.com/nunit/nunit-project-loader</projectSourceUrl>
+    <docsUrl>https://github.com/nunit/docs/wiki/Console-Command-Line</docsUrl>
+    <bugTrackerUrl>https://github.com/nunit/nunit-project-loader/issues</bugTrackerUrl>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <packageSourceUrl>https://github.com/nunit/nunit-project-loader</packageSourceUrl>
+    <releaseNotes>https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt</releaseNotes>
+    <mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
+    <licenseUrl>http://nunit.org/nuget/nunit3-license.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <authors>Charlie Poole</authors>
+    <owners>Charlie Poole</owners>
+    <language>en-US</language>
+    <tags>nunit test testing tdd runner</tags>
+    <copyright>Copyright (c) 2017 Charlie Poole</copyright>
+  </metadata>
+</package>

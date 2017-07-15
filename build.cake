@@ -4,7 +4,6 @@
 // PROJECT-SPECIFIC
 //////////////////////////////////////////////////////////////////////
 var SOLUTION_FILE = "nunit-project-loader.sln";
-var NUSPEC_FILE = "nunit-project-loader.nuspec";
 var UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
 
 //////////////////////////////////////////////////////////////////////
@@ -13,6 +12,9 @@ var UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Debug");
+var nugetVersion = Argument("nugetVersion", (string)null);
+var chocoVersion = Argument("chocoVersion", (string)null);
+var binaries = Argument("binaries", (string)null);
 
 //////////////////////////////////////////////////////////////////////
 // SET PACKAGE VERSION
@@ -69,13 +71,17 @@ if (BuildSystem.IsRunningOnAppVeyor)
 
 // Directories
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var PACKAGE_DIR = PROJECT_DIR + "package/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
+var OUTPUT_DIR = PROJECT_DIR + "output/";
 
-// File PATHS
-var SOLUTION_PATH = PROJECT_DIR + SOLUTION_FILE;
-var NUSPEC_PATH = PROJECT_DIR + NUSPEC_FILE;
-var UNIT_TEST_PATH = BIN_DIR + UNIT_TEST_ASSEMBLY;
+if (binaries == null)
+	binaries = BIN_DIR;
+else if (!System.IO.Path.IsPathRooted(binaries))
+{
+	binaries = PROJECT_DIR + binaries;
+	if (!binaries.EndsWith("/"))
+		binaries += "/";
+}
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]
@@ -102,7 +108,7 @@ Task("Clean")
 Task("NuGetRestore")
     .Does(() =>
 {
-    NuGetRestore(SOLUTION_PATH, new NuGetRestoreSettings()
+    NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
 	{
 		Source = PACKAGE_SOURCE
 	});
@@ -116,11 +122,24 @@ Task("Build")
     .IsDependentOn("NuGetRestore")
     .Does(() =>
     {
-        DotNetBuild(SOLUTION_PATH, settings => settings
-            .WithTarget("Build")
-            .SetConfiguration(configuration)
-            .SetVerbosity(Verbosity.Minimal)
-        );
+		if(IsRunningOnWindows())
+		{
+			MSBuild(SOLUTION_FILE, new MSBuildSettings()
+				.SetConfiguration(configuration)
+				.SetMSBuildPlatform(MSBuildPlatform.Automatic)
+				.SetVerbosity(Verbosity.Minimal)
+				.SetNodeReuse(false)
+				.SetPlatformTarget(PlatformTarget.MSIL)
+			);
+		}
+		else
+		{
+			XBuild(SOLUTION_FILE, new XBuildSettings()
+				.WithTarget("Build")
+				.WithProperty("Configuration", configuration)
+				.SetVerbosity(Verbosity.Minimal)
+			);
+		}
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -131,25 +150,44 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does(() =>
 	{
-		NUnit3(UNIT_TEST_PATH);
+		NUnit3(BIN_DIR + UNIT_TEST_ASSEMBLY);
 	});
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-Task("Package")
+Task("PackageNuGet")
 	.IsDependentOn("Build")
 	.Does(() => 
 	{
-		CreateDirectory(PACKAGE_DIR);
+        NuGetPack("nuget/nunit-project-loader.nuspec",
+			new NuGetPackSettings()
+			{
+				Version = nugetVersion ?? packageVersion,
+				OutputDirectory = OUTPUT_DIR,
+				Files = new [] {
+					new NuSpecContent { Source = "../LICENSE.txt" },
+					new NuSpecContent { Source = binaries + "nunit-project-loader.dll", Target = "tools" }
+				}
+			});
+	});
 
-        NuGetPack(NUSPEC_PATH, new NuGetPackSettings()
-        {
-            Version = packageVersion,
-            BasePath = BIN_DIR,
-            OutputDirectory = PACKAGE_DIR
-        });
+Task("PackageChocolatey")
+	.IsDependentOn("Build")
+	.Does(() =>
+	{
+		ChocolateyPack("choco/nunit-project-loader.choco.nuspec",
+			new ChocolateyPackSettings()
+			{
+				Version = chocoVersion ?? packageVersion,
+				OutputDirectory = OUTPUT_DIR,
+				Files = new [] {
+					new ChocolateyNuSpecContent { Source = "../LICENSE.txt", Target = "tools" },
+					new ChocolateyNuSpecContent { Source = "VERIFICATION.txt", Target = "tools" },
+					new ChocolateyNuSpecContent { Source = binaries + "nunit-project-loader.dll", Target = "tools" }
+				}
+			});
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -159,6 +197,10 @@ Task("Package")
 Task("Rebuild")
     .IsDependentOn("Clean")
 	.IsDependentOn("Build");
+
+Task("Package")
+	.IsDependentOn("PackageNuGet")
+	.IsDependentOn("PackageChocolatey");
 
 Task("Appveyor")
 	.IsDependentOn("Build")
