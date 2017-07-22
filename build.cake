@@ -194,6 +194,8 @@ var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-di
 Task("RePackageNuGet")
 	.Does(() => 
 	{
+		CreateDirectory(OUTPUT_DIR);
+		
         NuGetPack(
 			new NuGetPackSettings()
 			{
@@ -223,6 +225,8 @@ Task("RePackageNuGet")
 Task("RePackageChocolatey")
 	.Does(() =>
 	{
+		CreateDirectory(OUTPUT_DIR);
+
 		ChocolateyPack(
 			new ChocolateyPackSettings()
 			{
