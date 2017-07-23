@@ -1,10 +1,26 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.4.1
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.7.0
 
 //////////////////////////////////////////////////////////////////////
 // PROJECT-SPECIFIC
 //////////////////////////////////////////////////////////////////////
+
+// When copying the script to support a different extension, the
+// main changes needed should be in this section.
+
 var SOLUTION_FILE = "nunit-project-loader.sln";
 var UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
+var GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
+var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
+
+// Metadata used in the nuget and chocolatey packages
+var TITLE = "NUnit 3 - NUnit Project Loader Extension";
+var AUTHORS = new [] { "Charlie Poole" };
+var OWNERS = new [] { "Charlie Poole" };
+var DESCRIPTION = "This extension allows NUnit to recognize and load NUnit projects, file type .nunit.";
+var SUMMARY = "NUnit Engine extension for loading NUnit projects.";
+var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
+var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt" };
+var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -62,7 +78,7 @@ if (BuildSystem.IsRunningOnAppVeyor)
 			if (suffix.Length > 21)
 				suffix = suffix.Substring(0, 21);
 
-                        suffix = suffix.Replace(".", "");
+            suffix = suffix.Replace(".", "");
 
 			packageVersion = version + suffix;
 		}
@@ -170,32 +186,21 @@ Task("Test")
 // PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-// Metadata used in both nuget and chocolatey packages
-var TITLE = "NUnit 3 - NUnit Project Loader Extension";
-var AUTHORS = new [] { "Charlie Poole" };
-var OWNERS = new [] { "Charlie Poole" };
-var DESCRIPTION = "This extension allows NUnit to recognize and load NUnit projects, file type .nunit.";
-var SUMMARY = "NUnit Engine extension for loading NUnit projects.";
+// Additional package metadata
 var PROJECT_URL = new Uri("http://nunit.org");
 var ICON_URL = new Uri("https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png");
 var LICENSE_URL = new Uri("http://nunit.org/nuget/nunit3-license.txt");
-var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt" };
-var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
-
-// Metadata for chocolatey package only
-var GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
 var PROJECT_SOURCE_URL = new Uri( GITHUB_SITE );
 var PACKAGE_SOURCE_URL = new Uri( GITHUB_SITE );
 var BUG_TRACKER_URL = new Uri(GITHUB_SITE + "/issues");
-var DOCS_URL = new Uri("https://github.com/nunit/docs/wiki/Console-Command-Line");
+var DOCS_URL = new Uri(WIKI_PAGE);
 var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-discuss");
 
 Task("RePackageNuGet")
 	.Does(() => 
 	{
 		CreateDirectory(OUTPUT_DIR);
-		
+
         NuGetPack(
 			new NuGetPackSettings()
 			{
