@@ -11,6 +11,8 @@ var SOLUTION_FILE = "nunit-project-loader.sln";
 var UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
 var GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
 var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
+var NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
+var CHOCO_ID = "nunit-extension-nunit-project-loader";
 var VERSION = "3.6.0";
 
 // Metadata used in the nuget and chocolatey packages
@@ -20,7 +22,17 @@ var OWNERS = new [] { "Charlie Poole" };
 var DESCRIPTION = "This extension allows NUnit to recognize and load NUnit projects, file type .nunit.";
 var SUMMARY = "NUnit Engine extension for loading NUnit projects.";
 var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt" };
+var RELEASE_NOTES = new [] { 
+  		"Fixes several packaging errors and adds a new chocolatey package. Runners and engines",
+  		"installed under chocolatey will see and make use of this package.",
+		"",
+  		"Issues Resolved",
+		"",
+ 		"  * 2 Change API reference to released version",
+ 		"  * 4 Create file of constants for XML element and attribute names",
+ 		"  * 7 No license file in NuGet package",
+ 		"  * 8 Integrate chocolatey package in release build script"
+	};
 var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
 
 //////////////////////////////////////////////////////////////////////
@@ -203,7 +215,7 @@ Task("RePackageNuGet")
         NuGetPack(
 			new NuGetPackSettings()
 			{
-				Id = "NUnit.Extension.NUnitProjectLoader",
+				Id = NUGET_ID,
 				Version = nugetVersion ?? packageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
@@ -221,6 +233,7 @@ Task("RePackageNuGet")
 				OutputDirectory = OUTPUT_DIR,
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
+					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
 					new NuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
 				}
 			});
@@ -234,7 +247,7 @@ Task("RePackageChocolatey")
 		ChocolateyPack(
 			new ChocolateyPackSettings()
 			{
-				Id = "nunit-extension-nunit-project-loader",
+				Id = CHOCO_ID,
 				Version = chocoVersion ?? packageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
@@ -257,6 +270,7 @@ Task("RePackageChocolatey")
 				OutputDirectory = OUTPUT_DIR,
 				Files = new [] {
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
+					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
 				}
