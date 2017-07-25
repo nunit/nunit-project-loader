@@ -11,6 +11,7 @@ var SOLUTION_FILE = "nunit-project-loader.sln";
 var UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
 var GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
 var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
+var VERSION = "3.6.0";
 
 // Metadata used in the nuget and chocolatey packages
 var TITLE = "NUnit 3 - NUnit Project Loader Extension";
@@ -23,7 +24,7 @@ var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-
 var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
 
 //////////////////////////////////////////////////////////////////////
-// ARGUMENTS
+// ARGUMENTS  
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
@@ -42,10 +43,8 @@ var binaries = Argument("binaries", (string)null);
 // SET PACKAGE VERSION
 //////////////////////////////////////////////////////////////////////
 
-var version = "3.6.0";
-
 var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
-var packageVersion = version + dbgSuffix;
+var packageVersion = VERSION + dbgSuffix;
 
 if (BuildSystem.IsRunningOnAppVeyor)
 {
@@ -63,7 +62,7 @@ if (BuildSystem.IsRunningOnAppVeyor)
 
 		if (branch == "master" && !isPullRequest)
 		{
-			packageVersion = version + "-dev-" + buildNumber + dbgSuffix;
+			packageVersion = VERSION + "-dev-" + buildNumber + dbgSuffix;
 		}
 		else
 		{
@@ -80,7 +79,7 @@ if (BuildSystem.IsRunningOnAppVeyor)
 
             suffix = suffix.Replace(".", "");
 
-			packageVersion = version + suffix;
+			packageVersion = VERSION + suffix;
 		}
 	}
 
