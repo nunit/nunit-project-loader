@@ -1,7 +1,3 @@
-NUnit 3.5 - October 6, 2016
-
-  The first independent release of the nunit-project-loader extension.
-
 NUnit 3.6 - July 28, 2017
 
   Fixes several packaging errors and adds a new chocolatey package. Runners and engines
@@ -13,3 +9,7 @@ NUnit 3.6 - July 28, 2017
    * 4 Create file of constants for XML element and attribute names
    * 7 No license file in NuGet package
    * 8 Integrate chocolatey package in release build script
+
+NUnit 3.5 - October 6, 2016
+
+  The first independent release of the nunit-project-loader extension.

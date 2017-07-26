@@ -22,17 +22,7 @@ var OWNERS = new [] { "Charlie Poole" };
 var DESCRIPTION = "This extension allows NUnit to recognize and load NUnit projects, file type .nunit.";
 var SUMMARY = "NUnit Engine extension for loading NUnit projects.";
 var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-var RELEASE_NOTES = new [] { 
-  		"Fixes several packaging errors and adds a new chocolatey package. Runners and engines",
-  		"installed under chocolatey will see and make use of this package.",
-		"",
-  		"Issues Resolved",
-		"",
- 		"  * 2 Change API reference to released version",
- 		"  * 4 Create file of constants for XML element and attribute names",
- 		"  * 7 No license file in NuGet package",
- 		"  * 8 Integrate chocolatey package in release build script"
-	};
+var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt" };
 var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
 
 //////////////////////////////////////////////////////////////////////
