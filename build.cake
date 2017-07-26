@@ -11,6 +11,8 @@ var SOLUTION_FILE = "nunit-project-loader.sln";
 var UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
 var GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
 var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
+var NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
+var CHOCO_ID = "nunit-extension-nunit-project-loader";
 var VERSION = "3.6.0";
 
 // Metadata used in the nuget and chocolatey packages
@@ -203,7 +205,7 @@ Task("RePackageNuGet")
         NuGetPack(
 			new NuGetPackSettings()
 			{
-				Id = "NUnit.Extension.NUnitProjectLoader",
+				Id = NUGET_ID,
 				Version = nugetVersion ?? packageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
@@ -221,6 +223,7 @@ Task("RePackageNuGet")
 				OutputDirectory = OUTPUT_DIR,
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
+					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
 					new NuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
 				}
 			});
@@ -234,7 +237,7 @@ Task("RePackageChocolatey")
 		ChocolateyPack(
 			new ChocolateyPackSettings()
 			{
-				Id = "nunit-extension-nunit-project-loader",
+				Id = CHOCO_ID,
 				Version = chocoVersion ?? packageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
@@ -257,6 +260,7 @@ Task("RePackageChocolatey")
 				OutputDirectory = OUTPUT_DIR,
 				Files = new [] {
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
+					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
 				}
