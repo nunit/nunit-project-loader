@@ -1,4 +1,6 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.7.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.8.0
+#tool nuget:?package=NUnit.Extension.VSProjectLoader&version=3.7.0
+using System.Linq;
 
 //////////////////////////////////////////////////////////////////////
 // PROJECT-SPECIFIC
@@ -14,6 +16,7 @@ var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
 var NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 var CHOCO_ID = "nunit-extension-nunit-project-loader";
 var VERSION = "3.6.0";
+var TARGET_FRAMEWORKS = new [] { "net20", "net45" };
 
 // Metadata used in the nuget and chocolatey packages
 var TITLE = "NUnit 3 - NUnit Project Loader Extension";
@@ -152,24 +155,13 @@ Task("Build")
 		if (binaries != null)
 		    throw new Exception("The --binaries option may only be specified when re-packaging an existing build.");
 
-		if(IsRunningOnWindows())
-		{
-			MSBuild(SOLUTION_FILE, new MSBuildSettings()
-				.SetConfiguration(configuration)
-				.SetMSBuildPlatform(MSBuildPlatform.Automatic)
-				.SetVerbosity(Verbosity.Minimal)
-				.SetNodeReuse(false)
-				.SetPlatformTarget(PlatformTarget.MSIL)
-			);
-		}
-		else
-		{
-			XBuild(SOLUTION_FILE, new XBuildSettings()
-				.WithTarget("Build")
-				.WithProperty("Configuration", configuration)
-				.SetVerbosity(Verbosity.Minimal)
-			);
-		}
+		MSBuild(SOLUTION_FILE, new MSBuildSettings()
+			.SetConfiguration(configuration)
+			.SetMSBuildPlatform(MSBuildPlatform.Automatic)
+			.SetVerbosity(Verbosity.Minimal)
+			.SetNodeReuse(false)
+			.SetPlatformTarget(PlatformTarget.MSIL)
+		);
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -180,7 +172,10 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does(() =>
 	{
-		NUnit3(BIN_DIR + UNIT_TEST_ASSEMBLY);
+		foreach(var framework in TARGET_FRAMEWORKS)
+		{
+			NUnit3(System.IO.Path.Combine(BIN_DIR, framework, UNIT_TEST_ASSEMBLY));
+		}
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -202,6 +197,15 @@ Task("RePackageNuGet")
 	{
 		CreateDirectory(OUTPUT_DIR);
 
+		var files = new List<NuSpecContent>();
+		files.Add(new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" });
+		files.Add(new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" });
+
+		foreach(var framework in TARGET_FRAMEWORKS)
+		{
+			files.Add(new NuSpecContent { Source = BIN_SRC + framework + "/nunit-project-loader.dll", Target = "tools/" + framework });
+		}
+
         NuGetPack(
 			new NuGetPackSettings()
 			{
@@ -221,11 +225,7 @@ Task("RePackageNuGet")
 				Tags = TAGS,
 				//Language = "en-US",
 				OutputDirectory = OUTPUT_DIR,
-				Files = new [] {
-					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
-					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
-					new NuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
-				}
+				Files = files.ToArray()
 			});
 	});
 
@@ -233,6 +233,16 @@ Task("RePackageChocolatey")
 	.Does(() =>
 	{
 		CreateDirectory(OUTPUT_DIR);
+
+		var files = new List<ChocolateyNuSpecContent>();
+		files.Add(new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" });
+		files.Add(new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" });
+		files.Add(new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" });
+
+		foreach(var framework in TARGET_FRAMEWORKS)
+		{
+			files.Add(new ChocolateyNuSpecContent { Source = BIN_SRC + framework + "/nunit-project-loader.dll", Target = "tools/" + framework });
+		}
 
 		ChocolateyPack(
 			new ChocolateyPackSettings()
@@ -258,12 +268,8 @@ Task("RePackageChocolatey")
 				Tags = TAGS,
 				//Language = "en-US",
 				OutputDirectory = OUTPUT_DIR,
-				Files = new [] {
-					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
-				}
+				Files = files.ToArray(),
+				Verbose = true
 			});
 	});
 
