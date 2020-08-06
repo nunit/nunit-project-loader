@@ -225,7 +225,7 @@ Task("RePackageNuGet")
 				Tags = TAGS,
 				//Language = "en-US",
 				OutputDirectory = OUTPUT_DIR,
-				KeepTemporaryNuSpecFile =true,
+				KeepTemporaryNuSpecFile =false,
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
 					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
