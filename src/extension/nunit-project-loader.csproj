@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net20;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <OutputType>Library</OutputType>
     <RootNamespace>NUnit.Engine.Services.ProjectLoaders</RootNamespace>
     <AssemblyName>nunit-project-loader</AssemblyName>
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
 
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>

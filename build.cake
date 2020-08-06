@@ -13,7 +13,7 @@ var GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
 var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
 var NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 var CHOCO_ID = "nunit-extension-nunit-project-loader";
-var VERSION = "3.6.0";
+var VERSION = "3.12.0-beta1";
 
 // Metadata used in the nuget and chocolatey packages
 var TITLE = "NUnit 3 - NUnit Project Loader Extension";
@@ -202,6 +202,10 @@ Task("RePackageNuGet")
 	{
 		CreateDirectory(OUTPUT_DIR);
 
+		// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
+		var toolsSource  = BIN_SRC + "**/nunit-project-loader.dll";
+		toolsSource = toolsSource.Replace("/", @"\");
+
         NuGetPack(
 			new NuGetPackSettings()
 			{
@@ -221,10 +225,11 @@ Task("RePackageNuGet")
 				Tags = TAGS,
 				//Language = "en-US",
 				OutputDirectory = OUTPUT_DIR,
+				KeepTemporaryNuSpecFile =true,
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
 					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
-					new NuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
+					new NuSpecContent { Source = toolsSource, Target = "tools" }
 				}
 			});
 	});
@@ -233,6 +238,10 @@ Task("RePackageChocolatey")
 	.Does(() =>
 	{
 		CreateDirectory(OUTPUT_DIR);
+
+		// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
+		var toolsSource  = BIN_SRC + "**/nunit-project-loader.dll";
+		toolsSource = toolsSource.Replace("/", @"\");
 
 		ChocolateyPack(
 			new ChocolateyPackSettings()
@@ -262,7 +271,7 @@ Task("RePackageChocolatey")
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = BIN_SRC + "nunit-project-loader.dll", Target = "tools" }
+					new ChocolateyNuSpecContent { Source = toolsSource, Target = "tools" }
 				}
 			});
 	});
