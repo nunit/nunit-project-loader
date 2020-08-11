@@ -1,4 +1,4 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.7.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 
 //////////////////////////////////////////////////////////////////////
 // PROJECT-SPECIFIC
@@ -8,12 +8,13 @@
 // main changes needed should be in this section.
 
 var SOLUTION_FILE = "nunit-project-loader.sln";
+var OUTPUT_ASSEMBLY = "nunit-project-loader.dll";
 var UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
 var GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
 var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
 var NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 var CHOCO_ID = "nunit-extension-nunit-project-loader";
-var VERSION = "3.12.0-beta1";
+var VERSION = "3.7.0";
 
 // Metadata used in the nuget and chocolatey packages
 var TITLE = "NUnit 3 - NUnit Project Loader Extension";
@@ -24,6 +25,11 @@ var SUMMARY = "NUnit Engine extension for loading NUnit projects.";
 var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
 var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt" };
 var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
+var TARGET_FRAMEWORKS = new [] { "net20", "netcoreapp2.1" };
+
+// We don't support running tests built with .net core yet
+// var TEST_TARGET_FRAMEWORKS = TARGET_FRAMEWORKS
+var TEST_TARGET_FRAMEWORKS = new [] { "net20" };
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS  
@@ -180,7 +186,7 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does(() =>
 	{
-		NUnit3(BIN_DIR + UNIT_TEST_ASSEMBLY);
+		NUnit3(TEST_TARGET_FRAMEWORKS.Select(framework => System.IO.Path.Combine(BIN_DIR, framework, UNIT_TEST_ASSEMBLY)));
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -197,14 +203,16 @@ var BUG_TRACKER_URL = new Uri(GITHUB_SITE + "/issues");
 var DOCS_URL = new Uri(WIKI_PAGE);
 var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-discuss");
 
+// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
+// https://github.com/cake-build/cake/issues/2367
+// https://github.com/NuGet/Home/issues/3584
+var TOOLS_SOURCE  = BIN_SRC + "**/" + OUTPUT_ASSEMBLY;
+TOOLS_SOURCE = TOOLS_SOURCE.Replace("/", @"\");
+
 Task("RePackageNuGet")
 	.Does(() => 
 	{
 		CreateDirectory(OUTPUT_DIR);
-
-		// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
-		var toolsSource  = BIN_SRC + "**/nunit-project-loader.dll";
-		toolsSource = toolsSource.Replace("/", @"\");
 
         NuGetPack(
 			new NuGetPackSettings()
@@ -229,7 +237,7 @@ Task("RePackageNuGet")
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
 					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
-					new NuSpecContent { Source = toolsSource, Target = "tools" }
+					new NuSpecContent { Source = TOOLS_SOURCE, Target = "tools" }
 				}
 			});
 	});
@@ -238,10 +246,6 @@ Task("RePackageChocolatey")
 	.Does(() =>
 	{
 		CreateDirectory(OUTPUT_DIR);
-
-		// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
-		var toolsSource  = BIN_SRC + "**/nunit-project-loader.dll";
-		toolsSource = toolsSource.Replace("/", @"\");
 
 		ChocolateyPack(
 			new ChocolateyPackSettings()
@@ -271,7 +275,7 @@ Task("RePackageChocolatey")
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = toolsSource, Target = "tools" }
+					new ChocolateyNuSpecContent { Source = TOOLS_SOURCE, Target = "tools" }
 				}
 			});
 	});
