@@ -203,16 +203,16 @@ var BUG_TRACKER_URL = new Uri(GITHUB_SITE + "/issues");
 var DOCS_URL = new Uri(WIKI_PAGE);
 var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-discuss");
 
+// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
+// https://github.com/cake-build/cake/issues/2367
+// https://github.com/NuGet/Home/issues/3584
+var TOOLS_SOURCE  = BIN_SRC + "**/" + OUTPUT_ASSEMBLY;
+TOOLS_SOURCE = TOOLS_SOURCE.Replace("/", @"\");
+
 Task("RePackageNuGet")
 	.Does(() => 
 	{
 		CreateDirectory(OUTPUT_DIR);
-
-		// Could have used globbing:
-		// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
-		// https://github.com/cake-build/cake/issues/2367
-		// https://github.com/NuGet/Home/issues/3584
-		// And Linux-builds don't like backslashes...
 
         NuGetPack(
 			new NuGetPackSettings()
@@ -237,8 +237,7 @@ Task("RePackageNuGet")
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
 					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
-					new NuSpecContent { Source = BIN_SRC + $"{TARGET_FRAMEWORKS[0]}/" + OUTPUT_ASSEMBLY, Target = $"tools/{TARGET_FRAMEWORKS[0]}" },
-					new NuSpecContent { Source = BIN_SRC + $"{TARGET_FRAMEWORKS[1]}/" + OUTPUT_ASSEMBLY, Target = $"tools/{TARGET_FRAMEWORKS[1]}" },
+					new NuSpecContent { Source = TOOLS_SOURCE, Target = "tools" }
 				}
 			});
 	});
@@ -276,8 +275,7 @@ Task("RePackageChocolatey")
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = BIN_SRC + $"{TARGET_FRAMEWORKS[0]}/" + OUTPUT_ASSEMBLY, Target = $"tools/{TARGET_FRAMEWORKS[0]}" },
-					new ChocolateyNuSpecContent { Source = BIN_SRC + $"{TARGET_FRAMEWORKS[1]}/" + OUTPUT_ASSEMBLY, Target = $"tools/{TARGET_FRAMEWORKS[1]}" },
+					new ChocolateyNuSpecContent { Source = TOOLS_SOURCE, Target = "tools" }
 				}
 			});
 	});
