@@ -8,11 +8,6 @@ const string OUTPUT_ASSEMBLY = "nunit-project-loader.dll";
 const string UNIT_TEST_ASSEMBLY = "nunit-project-loader.tests.dll";
 const string MOCK_ASSEMBLY = "mock-assembly.dll";
 
-// Directories
-var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
-var OUTPUT_DIR = PROJECT_DIR + "output/";
-
 // Packaging
 const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 const string CHOCO_ID = "nunit-extension-nunit-project-loader";

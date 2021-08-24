@@ -15,67 +15,32 @@ const string DEFAULT_CONFIGURATION = "Release";
 
 var target = Argument("target", "Default");
 var packageVersion = Argument("version", DEFAULT_VERSION);
-var configuration = Argument("configuration", DEFAULT_CONFIGURATION);
 
 // Load additional cake files here since some of them
 // depend on the arguments provided.
-#load cake/constants.cake
+#load cake/parameters.cake
 
 //////////////////////////////////////////////////////////////////////
-// SET PACKAGE VERSION ON APPVEYOR
+// SETUP AND TEARDOWN
 //////////////////////////////////////////////////////////////////////
 
-// Since we don't pass a version argument
-// in AppVeyor.yml, it will be set to the
-// default. We change it here.
-if (BuildSystem.IsRunningOnAppVeyor)
+Setup<BuildParameters>((context) =>
 {
-	var tag = AppVeyor.Environment.Repository.Tag;
+	var parameters = new BuildParameters(context);
 
-	if (tag.IsTag)
-	{
-		packageVersion = tag.Name;
-	}
-	else
-	{
-		var buildNumber = AppVeyor.Environment.Build.Number.ToString("00000");
-		var branch = AppVeyor.Environment.Repository.Branch;
-		var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
+	Information("Building {0} version {1} of NUnit Project Loader.", parameters.Configuration, parameters.PackageVersion);
 
-		if (branch == "master" && !isPullRequest)
-		{
-			packageVersion = DEFAULT_VERSION + "-dev-" + buildNumber;
-		}
-		else
-		{
-			var suffix = "-ci-" + buildNumber;
-
-			if (isPullRequest)
-				suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
-			else
-				suffix += "-" + branch;
-
-			// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-			if (suffix.Length > 21)
-				suffix = suffix.Substring(0, 21);
-
-            suffix = suffix.Replace(".", "");
-
-			packageVersion = DEFAULT_VERSION + suffix;
-		}
-	}
-
-	AppVeyor.UpdateBuildVersion(packageVersion);
-}
+	return parameters;
+});
 
 //////////////////////////////////////////////////////////////////////
 // CLEAN
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
-    .Does(() =>
+    .Does<BuildParameters>((parameters) =>
 {
-    CleanDirectory(BIN_DIR);
+    CleanDirectory(parameters.OutputDirectory);
 });
 
 
@@ -98,12 +63,12 @@ Task("NuGetRestore")
 
 Task("Build")
     .IsDependentOn("NuGetRestore")
-    .Does(() =>
+    .Does<BuildParameters>((parameters) =>
     {
 		if(IsRunningOnWindows())
 		{
 			MSBuild(SOLUTION_FILE, new MSBuildSettings()
-				.SetConfiguration(configuration)
+				.SetConfiguration(parameters.Configuration)
 				.SetMSBuildPlatform(MSBuildPlatform.Automatic)
 				.SetVerbosity(Verbosity.Minimal)
 				.SetNodeReuse(false)
@@ -114,7 +79,7 @@ Task("Build")
 		{
 			XBuild(SOLUTION_FILE, new XBuildSettings()
 				.WithTarget("Build")
-				.WithProperty("Configuration", configuration)
+				.WithProperty("Configuration", parameters.Configuration)
 				.SetVerbosity(Verbosity.Minimal)
 			);
 		}
@@ -126,9 +91,10 @@ Task("Build")
 
 Task("Test")
 	.IsDependentOn("Build")
-	.Does(() =>
+	.Does<BuildParameters>((parameters) =>
 	{
-		NUnit3(TEST_TARGET_FRAMEWORKS.Select(framework => System.IO.Path.Combine(BIN_DIR, framework, UNIT_TEST_ASSEMBLY)));
+		NUnit3(TEST_TARGET_FRAMEWORKS.Select(framework => System.IO.Path.Combine(
+			parameters.OutputDirectory, framework, UNIT_TEST_ASSEMBLY)));
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -136,21 +102,23 @@ Task("Test")
 //////////////////////////////////////////////////////////////////////
 
 Task("PackageNuGet")
-	.Does(() => 
+	.Does<BuildParameters>((parameters) => 
 	{
 		var content = new List<NuSpecContent>();
-		content.Add(new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" });
-		content.Add(new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" });
+		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" });
+		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt" });
 		foreach (string framework in TARGET_FRAMEWORKS)
-			content.Add(new NuSpecContent { Source = $"{BIN_DIR}{framework}/nunit-project-loader.dll", Target = $"tools/{framework}" });
+			content.Add(new NuSpecContent {
+				Source = $"{parameters.OutputDirectory}{framework}/nunit-project-loader.dll",
+				Target = $"tools/{framework}" });
 
-		CreateDirectory(OUTPUT_DIR);
+		CreateDirectory(parameters.PackageDirectory);
 
         NuGetPack(
 			new NuGetPackSettings()
 			{
 				Id = NUGET_ID,
-				Version = packageVersion,
+				Version = parameters.PackageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
 				Owners = OWNERS,
@@ -164,29 +132,31 @@ Task("PackageNuGet")
 				ReleaseNotes = RELEASE_NOTES,
 				Tags = TAGS,
 				//Language = "en-US",
-				OutputDirectory = OUTPUT_DIR,
+				OutputDirectory = parameters.PackageDirectory,
 				KeepTemporaryNuSpecFile =false,
 				Files = content
 			});
 	});
 
 Task("PackageChocolatey")
-	.Does(() =>
+	.Does<BuildParameters>((parameters) =>
 	{
-		CreateDirectory(OUTPUT_DIR);
+		CreateDirectory(parameters.PackageDirectory);
 
 		var content = new List<ChocolateyNuSpecContent>();
-		content.Add(new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" });
-		content.Add(new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" });
-		content.Add(new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" });
+		content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt", Target = "tools" });
+		content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" });
+		content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" });
 		foreach (string framework in TARGET_FRAMEWORKS)
-			content.Add(new ChocolateyNuSpecContent { Source = $"{BIN_DIR}{framework}/nunit-project-loader.dll", Target = $"tools/{framework}" });
+			content.Add(new ChocolateyNuSpecContent {
+				Source = $"{parameters.OutputDirectory}{framework}/nunit-project-loader.dll",
+				Target = $"tools/{framework}" });
 
 		ChocolateyPack(
 			new ChocolateyPackSettings()
 			{
 				Id = CHOCO_ID,
-				Version = packageVersion,
+				Version = parameters.PackageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
 				Owners = OWNERS,
@@ -205,7 +175,7 @@ Task("PackageChocolatey")
 				ReleaseNotes = RELEASE_NOTES,
 				Tags = TAGS,
 				//Language = "en-US",
-				OutputDirectory = OUTPUT_DIR,
+				OutputDirectory = parameters.PackageDirectory,
 				Files = content
 			});
 	});
