@@ -36,23 +36,12 @@ var TEST_TARGET_FRAMEWORKS = new [] { "net20" };
 //////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Debug");
-
-// Special (optional) arguments for the script. You pass these
-// through the Cake bootscrap script via the -ScriptArgs argument
-// for example: 
-//   ./build.ps1 -t RePackageNuget -ScriptArgs --nugetVersion="3.9.9"
-//   ./build.ps1 -t RePackageNuget -ScriptArgs '--binaries="rel3.9.9" --nugetVersion="3.9.9"'
-var nugetVersion = Argument("nugetVersion", (string)null);
-var chocoVersion = Argument("chocoVersion", (string)null);
-var binaries = Argument("binaries", (string)null);
+var packageVersion = Argument("packageVersion", VERSION);
+var configuration = Argument("configuration", "Release");
 
 //////////////////////////////////////////////////////////////////////
-// SET PACKAGE VERSION
+// SET PACKAGE VERSION ON APPVEYOR
 //////////////////////////////////////////////////////////////////////
-
-var dbgSuffix = configuration == "Debug" ? "-dbg" : "";
-var packageVersion = VERSION + dbgSuffix;
 
 if (BuildSystem.IsRunningOnAppVeyor)
 {
@@ -70,11 +59,11 @@ if (BuildSystem.IsRunningOnAppVeyor)
 
 		if (branch == "master" && !isPullRequest)
 		{
-			packageVersion = VERSION + "-dev-" + buildNumber + dbgSuffix;
+			packageVersion = VERSION + "-dev-" + buildNumber;
 		}
 		else
 		{
-			var suffix = "-ci-" + buildNumber + dbgSuffix;
+			var suffix = "-ci-" + buildNumber;
 
 			if (isPullRequest)
 				suffix += "-pr-" + AppVeyor.Environment.PullRequest.Number;
@@ -101,20 +90,7 @@ if (BuildSystem.IsRunningOnAppVeyor)
 // Directories
 var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
 var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
-var BIN_SRC = BIN_DIR; // Source of binaries used in packaging
 var OUTPUT_DIR = PROJECT_DIR + "output/";
-
-// Adjust BIN_SRC if --binaries option was given
-if (binaries != null)
-{
-	BIN_SRC = binaries;
-	if (!System.IO.Path.IsPathRooted(binaries))
-	{
-		BIN_SRC = PROJECT_DIR + binaries;
-		if (!BIN_SRC.EndsWith("/"))
-			BIN_SRC += "/";
-	}
-}
 
 // Package sources for nuget restore
 var PACKAGE_SOURCE = new string[]
@@ -152,12 +128,10 @@ Task("NuGetRestore")
 //////////////////////////////////////////////////////////////////////
 
 Task("Build")
+	.IsDependentOn("Clean")
     .IsDependentOn("NuGetRestore")
     .Does(() =>
     {
-		if (binaries != null)
-		    throw new Exception("The --binaries option may only be specified when re-packaging an existing build.");
-
 		if(IsRunningOnWindows())
 		{
 			MSBuild(SOLUTION_FILE, new MSBuildSettings()
@@ -203,13 +177,7 @@ var BUG_TRACKER_URL = new Uri(GITHUB_SITE + "/issues");
 var DOCS_URL = new Uri(WIKI_PAGE);
 var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-discuss");
 
-// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
-// https://github.com/cake-build/cake/issues/2367
-// https://github.com/NuGet/Home/issues/3584
-var TOOLS_SOURCE  = BIN_SRC + "**/" + OUTPUT_ASSEMBLY;
-TOOLS_SOURCE = TOOLS_SOURCE.Replace("/", @"\");
-
-Task("RePackageNuGet")
+Task("PackageNuGet")
 	.Does(() => 
 	{
 		CreateDirectory(OUTPUT_DIR);
@@ -218,7 +186,7 @@ Task("RePackageNuGet")
 			new NuGetPackSettings()
 			{
 				Id = NUGET_ID,
-				Version = nugetVersion ?? packageVersion,
+				Version = packageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
 				Owners = OWNERS,
@@ -237,12 +205,12 @@ Task("RePackageNuGet")
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
 					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
-					new NuSpecContent { Source = TOOLS_SOURCE, Target = "tools" }
+					new NuSpecContent { Source = BIN_DIR + "nunit-project-loader.dll", Target = "tools" }
 				}
 			});
 	});
 
-Task("RePackageChocolatey")
+Task("PackageChocolatey")
 	.Does(() =>
 	{
 		CreateDirectory(OUTPUT_DIR);
@@ -251,7 +219,7 @@ Task("RePackageChocolatey")
 			new ChocolateyPackSettings()
 			{
 				Id = CHOCO_ID,
-				Version = chocoVersion ?? packageVersion,
+				Version = packageVersion,
 				Title = TITLE,
 				Authors = AUTHORS,
 				Owners = OWNERS,
@@ -275,7 +243,7 @@ Task("RePackageChocolatey")
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = TOOLS_SOURCE, Target = "tools" }
+					new ChocolateyNuSpecContent { Source = BIN_DIR + "nunit-project-loader.dll", Target = "tools" }
 				}
 			});
 	});
@@ -284,17 +252,10 @@ Task("RePackageChocolatey")
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
-Task("Rebuild")
-    .IsDependentOn("Clean")
-	.IsDependentOn("Build");
-
 Task("Package")
 	.IsDependentOn("Build")
-	.IsDependentOn("RePackage");
-
-Task("RePackage")
-	.IsDependentOn("RePackageNuGet")
-	.IsDependentOn("RePackageChocolatey");
+	.IsDependentOn("PackageNuGet")
+	.IsDependentOn("PackageChocolatey");
 
 Task("Appveyor")
 	.IsDependentOn("Build")
