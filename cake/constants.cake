@@ -11,26 +11,26 @@ const string MOCK_ASSEMBLY = "mock-assembly.dll";
 // Packaging
 const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 const string CHOCO_ID = "nunit-extension-nunit-project-loader";
-const string GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
-const string WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
+//const string GITHUB_SITE = "https://github.com/nunit/nunit-project-loader";
+//const string WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
 
-// Metadata used in the nuget and chocolatey packages
-var TITLE = "NUnit 3 - NUnit Project Loader Extension";
-var AUTHORS = new[] { "Charlie Poole" };
-var OWNERS = new[] { "Charlie Poole" };
-var DESCRIPTION = "This extension allows NUnit to recognize and load NUnit projects, file type .nunit.";
-var SUMMARY = "NUnit Engine extension for loading NUnit projects.";
-var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-var RELEASE_NOTES = new[] { "See https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt" };
-var TAGS = new[] { "nunit", "test", "testing", "tdd", "runner" };
-var PROJECT_URL = new Uri("http://nunit.org");
-var ICON_URL = new Uri("https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png");
-var LICENSE_URL = new Uri("http://nunit.org/nuget/nunit3-license.txt");
-var PROJECT_SOURCE_URL = new Uri(GITHUB_SITE);
-var PACKAGE_SOURCE_URL = new Uri(GITHUB_SITE);
-var BUG_TRACKER_URL = new Uri(GITHUB_SITE + "/issues");
-var DOCS_URL = new Uri(WIKI_PAGE);
-var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-discuss");
+//// Metadata used in the nuget and chocolatey packages
+//var TITLE = "NUnit 3 - NUnit Project Loader Extension";
+//var AUTHORS = new[] { "Charlie Poole" };
+//var OWNERS = new[] { "Charlie Poole" };
+//var DESCRIPTION = "This extension allows NUnit to recognize and load NUnit projects, file type .nunit.";
+//var SUMMARY = "NUnit Engine extension for loading NUnit projects.";
+//var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
+//var RELEASE_NOTES = new[] { "See https://raw.githubusercontent.com/nunit/nunit-project-loader/master/CHANGES.txt" };
+//var TAGS = new[] { "nunit", "test", "testing", "tdd", "runner" };
+//var PROJECT_URL = new Uri("http://nunit.org");
+//var ICON_URL = new Uri("https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png");
+//var LICENSE_URL = new Uri("http://nunit.org/nuget/nunit3-license.txt");
+//var PROJECT_SOURCE_URL = new Uri(GITHUB_SITE);
+//var PACKAGE_SOURCE_URL = new Uri(GITHUB_SITE);
+//var BUG_TRACKER_URL = new Uri(GITHUB_SITE + "/issues");
+//var DOCS_URL = new Uri(WIKI_PAGE);
+//var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-discuss");
 
 // Package sources for nuget restore
 static readonly string[] PACKAGE_SOURCES = new string[]

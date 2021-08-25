@@ -17,6 +17,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-AB9D-497E-8FC3-B541A9A24EEC}"
 	ProjectSection(SolutionItems) = preProject
 		cake\constants.cake = cake\constants.cake
+		cake\package-tests.cake = cake\package-tests.cake
+		cake\packaging.cake = cake\packaging.cake
 	EndProjectSection
 EndProject
 Global

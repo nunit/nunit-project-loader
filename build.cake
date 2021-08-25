@@ -104,80 +104,19 @@ Task("Test")
 Task("PackageNuGet")
 	.Does<BuildParameters>((parameters) => 
 	{
-		var content = new List<NuSpecContent>();
-		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" });
-		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt" });
-		foreach (string framework in TARGET_FRAMEWORKS)
-			content.Add(new NuSpecContent {
-				Source = $"{parameters.OutputDirectory}{framework}/nunit-project-loader.dll",
-				Target = $"tools/{framework}" });
-
 		CreateDirectory(parameters.PackageDirectory);
 
-        NuGetPack(
-			new NuGetPackSettings()
-			{
-				Id = NUGET_ID,
-				Version = parameters.PackageVersion,
-				Title = TITLE,
-				Authors = AUTHORS,
-				Owners = OWNERS,
-				Description = DESCRIPTION,
-				Summary = SUMMARY,
-				ProjectUrl = PROJECT_URL,
-				IconUrl = ICON_URL,
-				LicenseUrl = LICENSE_URL,
-				RequireLicenseAcceptance = false,
-				Copyright = COPYRIGHT,
-				ReleaseNotes = RELEASE_NOTES,
-				Tags = TAGS,
-				//Language = "en-US",
-				OutputDirectory = parameters.PackageDirectory,
-				KeepTemporaryNuSpecFile =false,
-				Files = content
-			});
+		BuildNuGetPackage(parameters);
 	});
 
 Task("PackageChocolatey")
+	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
+
 		CreateDirectory(parameters.PackageDirectory);
 
-		var content = new List<ChocolateyNuSpecContent>();
-		content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt", Target = "tools" });
-		content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" });
-		content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" });
-		foreach (string framework in TARGET_FRAMEWORKS)
-			content.Add(new ChocolateyNuSpecContent {
-				Source = $"{parameters.OutputDirectory}{framework}/nunit-project-loader.dll",
-				Target = $"tools/{framework}" });
-
-		ChocolateyPack(
-			new ChocolateyPackSettings()
-			{
-				Id = CHOCO_ID,
-				Version = parameters.PackageVersion,
-				Title = TITLE,
-				Authors = AUTHORS,
-				Owners = OWNERS,
-				Description = DESCRIPTION,
-				Summary = SUMMARY,
-				ProjectUrl = PROJECT_URL,
-				IconUrl = ICON_URL,
-				LicenseUrl = LICENSE_URL,
-				RequireLicenseAcceptance = false,
-				Copyright = COPYRIGHT,
-				ProjectSourceUrl = PROJECT_SOURCE_URL,
-				DocsUrl = DOCS_URL,
-				BugTrackerUrl = BUG_TRACKER_URL,
-				PackageSourceUrl = PACKAGE_SOURCE_URL,
-				MailingListUrl = MAILING_LIST_URL,
-				ReleaseNotes = RELEASE_NOTES,
-				Tags = TAGS,
-				//Language = "en-US",
-				OutputDirectory = parameters.PackageDirectory,
-				Files = content
-			});
+		BuildChocolateyPackage(parameters);
 	});
 
 //////////////////////////////////////////////////////////////////////

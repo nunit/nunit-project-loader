@@ -1,5 +1,6 @@
 ﻿#load "./constants.cake"
-//#load "./packaging.cake"
+#load "./packaging.cake"
+//#load "./package-tests.cake"
 //#load "./test-runner.cake"
 //#load "./tests.cake"
 
