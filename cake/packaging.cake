@@ -30,10 +30,7 @@ public void BuildNuGetPackage(BuildParameters parameters)
 		var content = new List<NuSpecContent>();
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" });
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt" });
-		foreach (string framework in TARGET_FRAMEWORKS)
-			content.Add(new NuSpecContent {
-				Source = $"{parameters.OutputDirectory}{framework}/nunit-project-loader.dll",
-				Target = $"tools/{framework}" });
+		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools" });
 
 	NuGetPack(
 		new NuGetPackSettings()
@@ -71,12 +68,7 @@ public void BuildChocolateyPackage(BuildParameters parameters)
     content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt", Target = "tools" });
     content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" });
     content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" });
-    foreach (string framework in TARGET_FRAMEWORKS)
-        content.Add(new ChocolateyNuSpecContent
-        {
-            Source = $"{parameters.OutputDirectory}{framework}/nunit-project-loader.dll",
-            Target = $"tools/{framework}"
-        });
+	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools" });
 
     ChocolateyPack(
 		new ChocolateyPackSettings()
