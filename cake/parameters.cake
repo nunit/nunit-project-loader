@@ -1,8 +1,7 @@
 ﻿#load "./constants.cake"
 #load "./packaging.cake"
-//#load "./package-tests.cake"
-//#load "./test-runner.cake"
-//#load "./tests.cake"
+#load "./package-tests.cake"
+#load "./test-results.cake"
 
 using System;
 
@@ -81,9 +80,11 @@ public class BuildParameters
 	public string NuGetInstallDirectory => ToolsDirectory + NUGET_ID + "/";
 	public string ChocolateyInstallDirectory => ToolsDirectory + CHOCO_ID + "/";
 
-	// Files
-	public string NuGetPackage => PackageDirectory + NUGET_ID + "." + PackageVersion + ".nupkg";
-	public string ChocolateyPackage => PackageDirectory + CHOCO_ID + "." + PackageVersion + ".nupkg";
+	public string NuGetPackageName => NUGET_ID + "." + PackageVersion + ".nupkg";
+	public string ChocolateyPackageName => CHOCO_ID + "." + PackageVersion + ".nupkg";
+
+	public string NuGetPackage => PackageDirectory + NuGetPackageName;
+	public string ChocolateyPackage => PackageDirectory + ChocolateyPackageName;
 
 	public string GetPathToConsoleRunner(string version)
 	{

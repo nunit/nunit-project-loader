@@ -9,9 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-project-loader.tests"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3B28CF0C-D613-4971-9D8F-00C960C656E2}"
 	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
 		appveyor.yml = appveyor.yml
+		BothAssemblies.nunit = BothAssemblies.nunit
 		build.cake = build.cake
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		FailingAssembly.nunit = FailingAssembly.nunit
 		nunit-project-loader.nuspec = nunit-project-loader.nuspec
+		PassingAssembly.nunit = PassingAssembly.nunit
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-AB9D-497E-8FC3-B541A9A24EEC}"
@@ -19,7 +25,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-A
 		cake\constants.cake = cake\constants.cake
 		cake\package-tests.cake = cake\package-tests.cake
 		cake\packaging.cake = cake\packaging.cake
+		cake\test-results.cake = cake\test-results.cake
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-1", "src\test-lib-1\test-lib-1.csproj", "{1FA6F840-F225-4597-80AE-2C78B466D9C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test-lib-2", "src\test-lib-2\test-lib-2.csproj", "{7808DEA9-FB13-47FC-823F-DC78C1057061}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +46,14 @@ Global
 		{32A8075A-8DA8-49F8-9222-2DE7B4B6C98E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32A8075A-8DA8-49F8-9222-2DE7B4B6C98E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32A8075A-8DA8-49F8-9222-2DE7B4B6C98E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FA6F840-F225-4597-80AE-2C78B466D9C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FA6F840-F225-4597-80AE-2C78B466D9C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FA6F840-F225-4597-80AE-2C78B466D9C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FA6F840-F225-4597-80AE-2C78B466D9C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7808DEA9-FB13-47FC-823F-DC78C1057061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7808DEA9-FB13-47FC-823F-DC78C1057061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7808DEA9-FB13-47FC-823F-DC78C1057061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7808DEA9-FB13-47FC-823F-DC78C1057061}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

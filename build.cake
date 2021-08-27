@@ -1,4 +1,6 @@
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS  
@@ -101,15 +103,28 @@ Task("Test")
 // PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-Task("PackageNuGet")
-	.Does<BuildParameters>((parameters) => 
+Task("BuildNuGetPackage")
+	.Does<BuildParameters>((parameters) =>
 	{
 		CreateDirectory(parameters.PackageDirectory);
 
 		BuildNuGetPackage(parameters);
 	});
 
-Task("PackageChocolatey")
+Task("TestNuGetPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		var tester = new NuGetPackageTester(parameters);
+
+		tester.InstallPackage();
+		tester.VerifyPackage();
+		tester.RunPackageTests();
+
+		// In case of error, this will not be executed, leaving the directory available for examination
+		tester.UninstallPackage();
+	});
+
+Task("BuildChocolateyPackage")
 	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
@@ -117,6 +132,19 @@ Task("PackageChocolatey")
 		CreateDirectory(parameters.PackageDirectory);
 
 		BuildChocolateyPackage(parameters);
+	});
+
+Task("TestChocolateyPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		var tester = new ChocolateyPackageTester(parameters);
+
+		tester.InstallPackage();
+		tester.VerifyPackage();
+		tester.RunPackageTests();
+
+		// In case of error, this will not be executed, leaving the directory available for examination
+		tester.UninstallPackage();
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -127,6 +155,14 @@ Task("Package")
 	.IsDependentOn("Build")
 	.IsDependentOn("PackageNuGet")
 	.IsDependentOn("PackageChocolatey");
+
+Task("PackageNuGet")
+	.IsDependentOn("BuildNuGetPackage")
+	.IsDependentOn("TestNuGetPackage");
+
+Task("PackageChocolatey")
+	.IsDependentOn("BuildChocolateyPackage")
+	.IsDependentOn("TestChocolateyPackage");
 
 Task("Full")
 	.IsDependentOn("Clean")
