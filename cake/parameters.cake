@@ -1,7 +1,9 @@
 ﻿#load "./constants.cake"
 #load "./packaging.cake"
+#load "./package-checks.cake"
 #load "./package-tests.cake"
 #load "./test-results.cake"
+#load "./test-reports.cake"
 
 using System;
 

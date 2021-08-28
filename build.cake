@@ -111,40 +111,83 @@ Task("BuildNuGetPackage")
 		BuildNuGetPackage(parameters);
 	});
 
-Task("TestNuGetPackage")
+Task("InstallNuGetPackage")
+	.IsDependentOn("RemoveChocolateyPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
-		var tester = new NuGetPackageTester(parameters);
+		CleanDirectory(parameters.NuGetInstallDirectory);
+		Unzip(parameters.NuGetPackage, parameters.NuGetInstallDirectory);
 
-		tester.InstallPackage();
-		tester.VerifyPackage();
-		tester.RunPackageTests();
+		Information($"Unzipped {parameters.NuGetPackageName} to { parameters.NuGetInstallDirectory}");
+	});
 
-		// In case of error, this will not be executed, leaving the directory available for examination
-		tester.UninstallPackage();
+Task("VerifyNuGetPackage")
+	.IsDependentOn("InstallNuGetPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		Check.That(parameters.NuGetInstallDirectory,
+			HasFiles("CHANGES.txt", "LICENSE.txt"),
+			HasDirectory("tools").WithFile("nunit-project-loader.dll"));
+		Information("Verification was successful!");
+	});
+
+Task("TestNuGetPackage")
+	.IsDependentOn("InstallNuGetPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		new NuGetPackageTester(parameters).RunPackageTests();
+	});
+
+Task("RemoveNuGetPackageIfPresent")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if(DirectoryExists(parameters.NuGetInstallDirectory))
+			DeleteDirectory(parameters.NuGetInstallDirectory,
+				new DeleteDirectorySettings() { Recursive = true });
 	});
 
 Task("BuildChocolateyPackage")
 	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
-
 		CreateDirectory(parameters.PackageDirectory);
 
 		BuildChocolateyPackage(parameters);
 	});
 
-Task("TestChocolateyPackage")
+Task("InstallChocolateyPackage")
+	.IsDependentOn("RemoveNuGetPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
-		var tester = new ChocolateyPackageTester(parameters);
+		CleanDirectory(parameters.ChocolateyInstallDirectory);
+		Unzip(parameters.ChocolateyPackage, parameters.ChocolateyInstallDirectory);
 
-		tester.InstallPackage();
-		tester.VerifyPackage();
-		tester.RunPackageTests();
+		Information($"Unzipped {parameters.ChocolateyPackageName} to { parameters.ChocolateyInstallDirectory}");
+	});
 
-		// In case of error, this will not be executed, leaving the directory available for examination
-		tester.UninstallPackage();
+Task("VerifyChocolateyPackage")
+	.IsDependentOn("InstallChocolateyPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		Check.That(parameters.ChocolateyInstallDirectory,
+			HasDirectory("tools").WithFiles(
+				"CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll"));
+		Information("Verification was successful!");
+	});
+
+Task("TestChocolateyPackage")
+	.IsDependentOn("InstallChocolateyPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		new ChocolateyPackageTester(parameters).RunPackageTests();
+	});
+
+Task("RemoveChocolateyPackageIfPresent")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (DirectoryExists(parameters.ChocolateyInstallDirectory))
+			DeleteDirectory(parameters.ChocolateyInstallDirectory,
+				new DeleteDirectorySettings() { Recursive = true });
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -158,10 +201,12 @@ Task("Package")
 
 Task("PackageNuGet")
 	.IsDependentOn("BuildNuGetPackage")
+	.IsDependentOn("VerifyNuGetPackage")
 	.IsDependentOn("TestNuGetPackage");
 
 Task("PackageChocolatey")
 	.IsDependentOn("BuildChocolateyPackage")
+	.IsDependentOn("VerifyChocolateyPackage")
 	.IsDependentOn("TestChocolateyPackage");
 
 Task("Full")

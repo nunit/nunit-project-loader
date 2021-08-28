@@ -23,14 +23,17 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-AB9D-497E-8FC3-B541A9A24EEC}"
 	ProjectSection(SolutionItems) = preProject
 		cake\constants.cake = cake\constants.cake
+		cake\package-checks.cake = cake\package-checks.cake
 		cake\package-tests.cake = cake\package-tests.cake
 		cake\packaging.cake = cake\packaging.cake
+		cake\parameters.cake = cake\parameters.cake
+		cake\test-reports.cake = cake\test-reports.cake
 		cake\test-results.cake = cake\test-results.cake
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-1", "src\test-lib-1\test-lib-1.csproj", "{1FA6F840-F225-4597-80AE-2C78B466D9C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test-lib-2", "src\test-lib-2\test-lib-2.csproj", "{7808DEA9-FB13-47FC-823F-DC78C1057061}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-2", "src\test-lib-2\test-lib-2.csproj", "{7808DEA9-FB13-47FC-823F-DC78C1057061}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

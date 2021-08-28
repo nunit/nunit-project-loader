@@ -82,57 +82,14 @@ public abstract class PackageTester
 				}
 			});
 		}
-		//PackageTests.Add(new PackageTest()
-		//{
-		//	Description = "Run project with one assembly under 3.11.1 console",
-		//	Arguments = "OneAssembly.nunit",
-		//	ExpectedResult = new ExpectedResult("Passed")
-		//	{
-		//		Total = 4,
-		//		Passed = 4,
-		//		Failed = 0,
-		//		Warnings = 0,
-		//		Inconclusive = 0,
-		//		Skipped = 0,
-		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-		//	}
-		//});
-		//PackageTests.Add(new PackageTest()
-		//{
-		//	Description = "Run project with one assembly under 3.10.0 console",
-		//	Arguments = "OneAssembly.nunit",
-		//	ConsoleVersion = "3.10.0",
-		//	ExpectedResult = new ExpectedResult("Passed")
-		//	{
-		//		Total = 4,
-		//		Passed = 4,
-		//		Failed = 0,
-		//		Warnings = 0,
-		//		Inconclusive = 0,
-		//		Skipped = 0,
-		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-		//	}
-		//});
 	}
 
 	protected abstract string PackageName { get; }
 	protected abstract string PackageUnderTest { get; }
 	public abstract string InstallDirectory { get; }
-	public abstract PackageCheck[] PackageChecks { get; }
+
+	public PackageCheck[] PackageChecks { get; set; }
 	public List<PackageTest> PackageTests = new List<PackageTest>();
-
-	public void InstallPackage()
-	{
-		_context.CleanDirectory(InstallDirectory);
-		_context.Unzip(PackageUnderTest, InstallDirectory);
-	}
-
-	public void VerifyPackage()
-    {
-		_context.Information("Verifying NuGet package content...");
-		Check.That(InstallDirectory, PackageChecks);
-		_context.Information("Verification was successful!");
-	}
 
 	public void RunPackageTests()
     {
@@ -140,16 +97,16 @@ public abstract class PackageTester
 
 		foreach (var packageTest in PackageTests)
 		{
-				var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
-				// Delete result file ahead of time so we don't mistakenly
-				// read a left-over file from another test run. Leave the
-				// file after the run in case we need it to debug a failure.
-				if (_context.FileExists(resultFile))
-					_context.DeleteFile(resultFile);
+			var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
+			// Delete result file ahead of time so we don't mistakenly
+			// read a left-over file from another test run. Leave the
+			// file after the run in case we need it to debug a failure.
+			if (_context.FileExists(resultFile))
+				_context.DeleteFile(resultFile);
 
-				DisplayBanner(packageTest.Description + " - Console Version " + packageTest.ConsoleVersion);
+			DisplayBanner(packageTest.Description + " - Console Version " + packageTest.ConsoleVersion);
 
-				RunConsoleTest(packageTest.ConsoleVersion, packageTest.Arguments);
+			RunConsoleTest(packageTest.ConsoleVersion, packageTest.Arguments);
 
 			try
 			{
@@ -177,11 +134,6 @@ public abstract class PackageTester
 		// any errors,  we stop the run at this point.
 		if (anyErrors)
 			throw new Exception("One or more package tests had errors!");
-	}
-
-	public void UninstallPackage()
-	{
-		_context.DeleteDirectory(InstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 	}
 
 	private void RunConsoleTest(string consoleVersion, string arguments)
@@ -222,11 +174,6 @@ public class NuGetPackageTester : PackageTester
 	protected override string PackageName => _parameters.NuGetPackageName;
 	protected override string PackageUnderTest => _parameters.NuGetPackage;
 	public override string InstallDirectory => _parameters.NuGetInstallDirectory;
-	public override PackageCheck[] PackageChecks => new PackageCheck[]
-	{
-		HasFiles("CHANGES.txt", "LICENSE.txt"),
-		HasDirectory("tools").WithFile("nunit-project-loader.dll")
-    };
 }
 
 public class ChocolateyPackageTester : PackageTester
@@ -236,103 +183,4 @@ public class ChocolateyPackageTester : PackageTester
 	protected override string PackageName => _parameters.ChocolateyPackageName;
 	protected override string PackageUnderTest => _parameters.ChocolateyPackage;
 	public override string InstallDirectory => _parameters.ChocolateyInstallDirectory;
-	public override PackageCheck[] PackageChecks => new PackageCheck[]
-	{
-		HasDirectory("tools").WithFiles("CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt"),
-		HasDirectory("tools").WithFile("nunit-project-loader.dll")
-    };
-}
-
-//////////////////////////////////////////////////////////////////////
-// SYNTAX FOR EXPRESSING CHECKS
-//////////////////////////////////////////////////////////////////////
-
-private static class Check
-{
-	public static void That(string testDir, params PackageCheck[] checks)
-    {
-		foreach (var check in checks)
-			check.ApplyTo(testDir);
-    }
-}
-
-private static FileCheck HasFile(string file) => HasFiles(new[] { file });
-private static FileCheck HasFiles(params string[] files) => new FileCheck(files);
-
-private static DirectoryCheck HasDirectory(string dir) => new DirectoryCheck(dir);
-
-//////////////////////////////////////////////////////////////////////
-// PACKAGECHECK CLASS
-//////////////////////////////////////////////////////////////////////
-
-public abstract class PackageCheck
-{
-	public abstract void ApplyTo(string testDir);
-}
-
-//////////////////////////////////////////////////////////////////////
-// FILECHECK CLASS
-//////////////////////////////////////////////////////////////////////
-
-public class FileCheck : PackageCheck
-{
-	string[] _files;
-
-	public FileCheck(string[] files)
-	{
-		_files = files;
-	}
-
-	public override void ApplyTo(string testDir)
-	{
-		foreach (string file in _files)
-		{
-			if (!System.IO.File.Exists(System.IO.Path.Combine(testDir, file)))
-				throw new Exception($"File {file} was not found.");
-		}
-	}
-}
-
-//////////////////////////////////////////////////////////////////////
-// DIRECTORYCHECK CLASS
-//////////////////////////////////////////////////////////////////////
-
-public class DirectoryCheck : PackageCheck
-{
-	private string _path;
-	private List<string> _files = new List<string>();
-
-	public DirectoryCheck(string path)
-	{
-		_path = path;
-	}
-
-	public DirectoryCheck WithFiles(params string[] files)
-	{
-		_files.AddRange(files);
-		return this;
-	}
-
-	public DirectoryCheck WithFile(string file)
-	{
-		_files.Add(file);
-		return this;
-	}
-
-	public override void ApplyTo(string testDir)
-	{
-		string combinedPath = System.IO.Path.Combine(testDir, _path);
-
-		if (!System.IO.Directory.Exists(combinedPath))
-			throw new Exception($"Directory {_path} was not found.");
-
-		if (_files != null)
-		{
-			foreach (var file in _files)
-			{
-				if (!System.IO.File.Exists(System.IO.Path.Combine(combinedPath, file)))
-					throw new Exception($"File {file} was not found in directory {_path}.");
-			}
-		}
-	}
 }
