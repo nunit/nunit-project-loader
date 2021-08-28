@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-run id="0" runstate="Runnable" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.11.1.0" clr-version="4.0.30319.42000" start-time="2021-08-26 09:10:23Z" end-time="2021-08-26 09:10:24Z" duration="0.822414">
+  <command-line><![CDATA["C:/Users/charlie/dev/NUnit/nunit-project-loader/tools/NUnit.ConsoleRunner.3.11.1/tools/nunit3-console.exe" bin/Release/net45/test-lib-1.dll --result:NUnit3TestResult.xml]]></command-line>
+  <test-suite type="Assembly" id="0-1005" name="test-lib-1.dll" fullname="test-lib-1.dll" runstate="Runnable" testcasecount="4" result="Passed" start-time="2021-08-26 09:10:23Z" end-time="2021-08-26 09:10:24Z" duration="0.107675" total="4" passed="4" failed="0" warnings="0" inconclusive="0" skipped="0" asserts="0">
+    <environment framework-version="3.11.0.0" clr-version="4.0.30319.42000" os-version="Microsoft Windows NT 10.0.19043.0" platform="Win32NT" cwd="C:\Users\charlie\dev\NUnit\nunit-project-loader" machine-name="DESKTOP-LGDUV6A" user="charlie" user-domain="DESKTOP-LGDUV6A" culture="en-US" uiculture="en-US" os-architecture="x64" />
+    <settings>
+      <setting name="DisposeRunners" value="True" />
+      <setting name="WorkDirectory" value="C:\Users\charlie\dev\NUnit\nunit-project-loader" />
+      <setting name="ImageRuntimeVersion" value="4.0.30319" />
+      <setting name="ImageTargetFrameworkName" value=".NETFramework,Version=v4.5" />
+      <setting name="ImageRequiresX86" value="False" />
+      <setting name="ImageRequiresDefaultAppDomainAssemblyResolver" value="False" />
+      <setting name="RuntimeFramework" value="net-4.0" />
+      <setting name="NumberOfTestWorkers" value="2" />
+    </settings>
+    <properties>
+      <property name="_PID" value="7664" />
+      <property name="_APPDOMAIN" value="domain-" />
+    </properties>
+    <test-suite type="TestSuite" id="0-1006" name="test1" fullname="test1" runstate="Runnable" testcasecount="4" result="Passed" start-time="2021-08-26 09:10:23Z" end-time="2021-08-26 09:10:24Z" duration="0.088051" total="4" passed="4" failed="0" warnings="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestFixture" id="0-1000" name="Fixture1" fullname="test1.Fixture1" classname="test1.Fixture1" runstate="Runnable" testcasecount="4" result="Passed" start-time="2021-08-26 09:10:23Z" end-time="2021-08-26 09:10:24Z" duration="0.075666" total="4" passed="4" failed="0" warnings="0" inconclusive="0" skipped="0" asserts="0">
+        <test-case id="0-1001" name="TestMethod1" fullname="test1.Fixture1.TestMethod1" methodname="TestMethod1" classname="test1.Fixture1" runstate="Runnable" seed="1522707884" result="Passed" start-time="2021-08-26 09:10:24Z" end-time="2021-08-26 09:10:24Z" duration="0.005980" asserts="0" />
+        <test-case id="0-1002" name="TestMethod2" fullname="test1.Fixture1.TestMethod2" methodname="TestMethod2" classname="test1.Fixture1" runstate="Runnable" seed="1080731065" result="Passed" start-time="2021-08-26 09:10:24Z" end-time="2021-08-26 09:10:24Z" duration="0.000169" asserts="0" />
+        <test-case id="0-1003" name="TestMethod3" fullname="test1.Fixture1.TestMethod3" methodname="TestMethod3" classname="test1.Fixture1" runstate="Runnable" seed="1714178401" result="Passed" start-time="2021-08-26 09:10:24Z" end-time="2021-08-26 09:10:24Z" duration="0.000150" asserts="0" />
+        <test-case id="0-1004" name="TestMethod4" fullname="test1.Fixture1.TestMethod4" methodname="TestMethod4" classname="test1.Fixture1" runstate="Runnable" seed="1756989196" result="Passed" start-time="2021-08-26 09:10:24Z" end-time="2021-08-26 09:10:24Z" duration="0.000097" asserts="0" />
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
