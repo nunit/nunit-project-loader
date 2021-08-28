@@ -114,7 +114,14 @@ Task("BuildNuGetPackage")
 Task("TestNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		var tester = new NuGetPackageTester(parameters);
+		var tester = new NuGetPackageTester(parameters)
+		{
+			PackageChecks = new PackageCheck[]
+			{
+				HasFiles("CHANGES.txt", "LICENSE.txt"),
+				HasDirectory("tools").WithFile("nunit-project-loader.dll")
+			}
+		};
 
 		tester.InstallPackage();
 		tester.VerifyPackage();
@@ -137,7 +144,14 @@ Task("BuildChocolateyPackage")
 Task("TestChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		var tester = new ChocolateyPackageTester(parameters);
+		var tester = new ChocolateyPackageTester(parameters)
+		{
+			PackageChecks = new PackageCheck[]
+			{
+				HasDirectory("tools").WithFiles(
+					"CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll")
+			}
+		};
 
 		tester.InstallPackage();
 		tester.VerifyPackage();

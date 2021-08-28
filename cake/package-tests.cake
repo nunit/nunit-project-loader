@@ -82,43 +82,13 @@ public abstract class PackageTester
 				}
 			});
 		}
-		//PackageTests.Add(new PackageTest()
-		//{
-		//	Description = "Run project with one assembly under 3.11.1 console",
-		//	Arguments = "OneAssembly.nunit",
-		//	ExpectedResult = new ExpectedResult("Passed")
-		//	{
-		//		Total = 4,
-		//		Passed = 4,
-		//		Failed = 0,
-		//		Warnings = 0,
-		//		Inconclusive = 0,
-		//		Skipped = 0,
-		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-		//	}
-		//});
-		//PackageTests.Add(new PackageTest()
-		//{
-		//	Description = "Run project with one assembly under 3.10.0 console",
-		//	Arguments = "OneAssembly.nunit",
-		//	ConsoleVersion = "3.10.0",
-		//	ExpectedResult = new ExpectedResult("Passed")
-		//	{
-		//		Total = 4,
-		//		Passed = 4,
-		//		Failed = 0,
-		//		Warnings = 0,
-		//		Inconclusive = 0,
-		//		Skipped = 0,
-		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-		//	}
-		//});
 	}
 
 	protected abstract string PackageName { get; }
 	protected abstract string PackageUnderTest { get; }
 	public abstract string InstallDirectory { get; }
-	public abstract PackageCheck[] PackageChecks { get; }
+
+	public PackageCheck[] PackageChecks { get; set; }
 	public List<PackageTest> PackageTests = new List<PackageTest>();
 
 	public void InstallPackage()
@@ -222,11 +192,6 @@ public class NuGetPackageTester : PackageTester
 	protected override string PackageName => _parameters.NuGetPackageName;
 	protected override string PackageUnderTest => _parameters.NuGetPackage;
 	public override string InstallDirectory => _parameters.NuGetInstallDirectory;
-	public override PackageCheck[] PackageChecks => new PackageCheck[]
-	{
-		HasFiles("CHANGES.txt", "LICENSE.txt"),
-		HasDirectory("tools").WithFile("nunit-project-loader.dll")
-    };
 }
 
 public class ChocolateyPackageTester : PackageTester
@@ -236,9 +201,4 @@ public class ChocolateyPackageTester : PackageTester
 	protected override string PackageName => _parameters.ChocolateyPackageName;
 	protected override string PackageUnderTest => _parameters.ChocolateyPackage;
 	public override string InstallDirectory => _parameters.ChocolateyInstallDirectory;
-	public override PackageCheck[] PackageChecks => new PackageCheck[]
-	{
-		HasDirectory("tools").WithFiles("CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt"),
-		HasDirectory("tools").WithFile("nunit-project-loader.dll")
-    };
 }
