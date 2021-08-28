@@ -91,35 +91,22 @@ public abstract class PackageTester
 	public PackageCheck[] PackageChecks { get; set; }
 	public List<PackageTest> PackageTests = new List<PackageTest>();
 
-	public void InstallPackage()
-	{
-		_context.CleanDirectory(InstallDirectory);
-		_context.Unzip(PackageUnderTest, InstallDirectory);
-	}
-
-	public void VerifyPackage()
-    {
-		_context.Information("Verifying NuGet package content...");
-		Check.That(InstallDirectory, PackageChecks);
-		_context.Information("Verification was successful!");
-	}
-
 	public void RunPackageTests()
     {
 		var reporter = new ResultReporter(PackageName);
 
 		foreach (var packageTest in PackageTests)
 		{
-				var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
-				// Delete result file ahead of time so we don't mistakenly
-				// read a left-over file from another test run. Leave the
-				// file after the run in case we need it to debug a failure.
-				if (_context.FileExists(resultFile))
-					_context.DeleteFile(resultFile);
+			var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
+			// Delete result file ahead of time so we don't mistakenly
+			// read a left-over file from another test run. Leave the
+			// file after the run in case we need it to debug a failure.
+			if (_context.FileExists(resultFile))
+				_context.DeleteFile(resultFile);
 
-				DisplayBanner(packageTest.Description + " - Console Version " + packageTest.ConsoleVersion);
+			DisplayBanner(packageTest.Description + " - Console Version " + packageTest.ConsoleVersion);
 
-				RunConsoleTest(packageTest.ConsoleVersion, packageTest.Arguments);
+			RunConsoleTest(packageTest.ConsoleVersion, packageTest.Arguments);
 
 			try
 			{
@@ -147,11 +134,6 @@ public abstract class PackageTester
 		// any errors,  we stop the run at this point.
 		if (anyErrors)
 			throw new Exception("One or more package tests had errors!");
-	}
-
-	public void UninstallPackage()
-	{
-		_context.DeleteDirectory(InstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 	}
 
 	private void RunConsoleTest(string consoleVersion, string arguments)

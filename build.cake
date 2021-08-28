@@ -114,21 +114,22 @@ Task("BuildNuGetPackage")
 Task("TestNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		var tester = new NuGetPackageTester(parameters)
-		{
-			PackageChecks = new PackageCheck[]
-			{
-				HasFiles("CHANGES.txt", "LICENSE.txt"),
-				HasDirectory("tools").WithFile("nunit-project-loader.dll")
-			}
-		};
+		string testDirectory = parameters.NuGetInstallDirectory;
 
-		tester.InstallPackage();
-		tester.VerifyPackage();
-		tester.RunPackageTests();
+		Information("Unzipping " + parameters.NuGetPackageName);
+		CleanDirectory(testDirectory);
+		Unzip(parameters.NuGetPackage, testDirectory);
+
+		Information("Verifying Chocolatey package content...");
+		Check.That(testDirectory,
+			HasFiles("CHANGES.txt", "LICENSE.txt"),
+			HasDirectory("tools").WithFile("nunit-project-loader.dll"));
+		Information("Verification was successful!");
+
+		new NuGetPackageTester(parameters).RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
-		tester.UninstallPackage();
+		DeleteDirectory(testDirectory, new DeleteDirectorySettings() { Recursive = true });
 	});
 
 Task("BuildChocolateyPackage")
@@ -144,21 +145,21 @@ Task("BuildChocolateyPackage")
 Task("TestChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		var tester = new ChocolateyPackageTester(parameters)
-		{
-			PackageChecks = new PackageCheck[]
-			{
-				HasDirectory("tools").WithFiles(
-					"CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll")
-			}
-		};
+		string testDirectory = parameters.ChocolateyInstallDirectory;
 
-		tester.InstallPackage();
-		tester.VerifyPackage();
-		tester.RunPackageTests();
+		Information("Unzipping " + parameters.ChocolateyPackageName);
+		CleanDirectory(testDirectory);
+		Unzip(parameters.ChocolateyPackage, testDirectory);
+
+		Information("Verifying NuGet package content...");
+		Check.That(testDirectory, HasDirectory("tools").WithFiles(
+			"CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll"));
+		Information("Verification was successful!");
+
+		new ChocolateyPackageTester(parameters).RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
-		tester.UninstallPackage();
+		DeleteDirectory(testDirectory, new DeleteDirectorySettings() { Recursive = true });
 	});
 
 //////////////////////////////////////////////////////////////////////
