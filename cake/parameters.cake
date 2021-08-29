@@ -22,6 +22,10 @@ public class BuildParameters
 		Configuration = _context.Argument("configuration", DEFAULT_CONFIGURATION);
 		PackageVersion = _context.Argument("version", DEFAULT_VERSION);
 
+		MyGetApiKey = _context.EnvironmentVariable(MYGET_API_KEY);
+		NuGetApiKey = _context.EnvironmentVariable(NUGET_API_KEY);
+		ChocolateyApiKey = _context.EnvironmentVariable(CHOCO_API_KEY);
+
 		// Since we don't pass a version argument
 		// in AppVeyor.yml, it will be set to the
 		// default. We change it here.
