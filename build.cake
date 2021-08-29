@@ -191,6 +191,43 @@ Task("RemoveChocolateyPackageIfPresent")
 	});
 
 //////////////////////////////////////////////////////////////////////
+// PUBLISH
+//////////////////////////////////////////////////////////////////////
+
+static bool hadPublishingErrors = false;
+
+Task("PublishPackages")
+	.Description("Publish nuget and chocolatey packages according to the current settings")
+	.IsDependentOn("PublishToMyGet")
+	//.IsDependentOn("PublishToNuGet")
+	//.IsDependentOn("PublishToChocolatey")
+	.Does(() =>
+	{
+		if (hadPublishingErrors)
+			throw new Exception("One of the publishing steps failed.");
+	});
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToMyGet")
+	.Description("Publish packages to MyGet")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToMyGet)
+			Information("Nothing to publish to MyGet from this run.");
+		else
+			try
+			{
+				PushNuGetPackage(parameters.NuGetPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
+				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
+//////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
