@@ -259,7 +259,8 @@ Task("Travis")
 Task("Appveyor")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
-	.IsDependentOn("Package");
+	.IsDependentOn("Package")
+	.IsDependentOn("PublishPackages");
 
 Task("Default")
     .IsDependentOn("Build");
