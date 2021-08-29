@@ -1,3 +1,4 @@
+#tool nuget:?package=GitVersion.CommandLine&version=5.0.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
@@ -28,12 +29,25 @@ var packageVersion = Argument("version", DEFAULT_VERSION);
 
 Setup<BuildParameters>((context) =>
 {
-	var parameters = new BuildParameters(context);
+	var parameters = BuildParameters.Create(context);
+
+	if (BuildSystem.IsRunningOnAppVeyor)
+		AppVeyor.UpdateBuildVersion(parameters.PackageVersion + "-" + AppVeyor.Environment.Build.Number);
 
 	Information("Building {0} version {1} of NUnit Project Loader.", parameters.Configuration, parameters.PackageVersion);
 
 	return parameters;
 });
+
+//////////////////////////////////////////////////////////////////////
+// DUMP SETTINGS
+//////////////////////////////////////////////////////////////////////
+
+Task("DumpSettings")
+	.Does<BuildParameters>((parameters) =>
+	{
+		parameters.DumpSettings();
+	});
 
 //////////////////////////////////////////////////////////////////////
 // CLEAN
