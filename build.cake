@@ -241,6 +241,25 @@ Task("PublishToMyGet")
 			}
 	});
 
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToNuGet")
+	.Description("Publish packages to NuGet")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToNuGet)
+			Information("Nothing to publish to NuGet from this run.");
+		else
+			try
+			{
+				PushNuGetPackage(parameters.NuGetPackage, parameters.NuGetApiKey, parameters.NuGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
