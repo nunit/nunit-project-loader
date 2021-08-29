@@ -43,6 +43,7 @@ public class BuildParameters
 				if (branch == "master" && !isPullRequest)
 				{
 					PackageVersion = DEFAULT_VERSION + "-dev-" + buildNumber;
+					ShouldPublishToMyGet = true;
 				}
 				else
 				{
@@ -87,6 +88,18 @@ public class BuildParameters
 
 	public string NuGetPackage => PackageDirectory + NuGetPackageName;
 	public string ChocolateyPackage => PackageDirectory + ChocolateyPackageName;
+
+	public string MyGetPushUrl => MYGET_PUSH_URL;
+	public string NuGetPushUrl => NUGET_PUSH_URL;
+	public string ChocolateyPushUrl => CHOCO_PUSH_URL;
+
+	public string MyGetApiKey { get; }
+	public string NuGetApiKey { get; }
+	public string ChocolateyApiKey { get; }
+
+	public bool ShouldPublishToMyGet { get; }
+	//public bool ShouldPublishToMyGet =>
+	//	!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(BuildVersion.PreReleaseLabel);
 
 	public string GetPathToConsoleRunner(string version)
 	{
