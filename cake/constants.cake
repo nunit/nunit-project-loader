@@ -26,7 +26,7 @@ static readonly string[] PACKAGE_SOURCES = new string[]
 var TEST_TARGET_FRAMEWORKS = new[] { "net20" };
 
 // URLs for uploading packages
-private const string MYGET_PUSH_URL = "https://www.myget.org/F/testcentric/api/v2";
+private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
 private const string NUGET_PUSH_URL = "https://api.nuget.org/v3/index.json";
 private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
 
