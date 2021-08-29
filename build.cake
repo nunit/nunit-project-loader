@@ -213,7 +213,7 @@ static bool hadPublishingErrors = false;
 Task("PublishPackages")
 	.Description("Publish nuget and chocolatey packages according to the current settings")
 	.IsDependentOn("PublishToMyGet")
-	//.IsDependentOn("PublishToNuGet")
+	.IsDependentOn("PublishToNuGet")
 	//.IsDependentOn("PublishToChocolatey")
 	.Does(() =>
 	{
