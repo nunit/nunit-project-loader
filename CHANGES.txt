@@ -1,3 +1,18 @@
+NUnit Project Loader Extension 3.7 - August 29, 2021
+
+  No new features or bug fixes but includes changes in the build script
+  to facilitate moving to the next major version of the extension, v4.0.
+
+  This is expected to be the final release of the 3.x series.
+  
+  Issues Resolved
+
+   * 17 Add functional package tests to build
+   * 18 Automate publication of packages
+   * 20 Update Cake version and get build working again
+   * 23 Refactor Cake scripts
+   * 33 Specify console versions for each test separately
+
 NUnit Project Loader Extension 3.6 - July 28, 2017
 
   Fixes several packaging errors and adds a new chocolatey package. Runners and engines

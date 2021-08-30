@@ -15,10 +15,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.cake = build.cake
 		build.ps1 = build.ps1
 		build.sh = build.sh
+		CHANGES.txt = CHANGES.txt
 		FailingAssembly.nunit = FailingAssembly.nunit
 		GitVersion.yml = GitVersion.yml
+		LICENSE.txt = LICENSE.txt
 		nunit-project-loader.nuspec = nunit-project-loader.nuspec
 		PassingAssembly.nunit = PassingAssembly.nunit
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-AB9D-497E-8FC3-B541A9A24EEC}"
