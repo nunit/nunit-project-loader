@@ -214,7 +214,7 @@ Task("PublishPackages")
 	.Description("Publish nuget and chocolatey packages according to the current settings")
 	.IsDependentOn("PublishToMyGet")
 	.IsDependentOn("PublishToNuGet")
-	//.IsDependentOn("PublishToChocolatey")
+	.IsDependentOn("PublishToChocolatey")
 	.Does(() =>
 	{
 		if (hadPublishingErrors)
@@ -253,6 +253,25 @@ Task("PublishToNuGet")
 			try
 			{
 				PushNuGetPackage(parameters.NuGetPackage, parameters.NuGetApiKey, parameters.NuGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToChocolatey")
+	.Description("Publish packages to Chocolatey")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToChocolatey)
+			Information("Nothing to publish to Chocolatey from this run.");
+		else
+			try
+			{
+				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.ChocolateyApiKey, parameters.ChocolateyPushUrl);
 			}
 			catch (Exception)
 			{
