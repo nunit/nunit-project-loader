@@ -6,13 +6,15 @@
 public class PackageTestReport
 {
 	public PackageTest Test;
+	public string ConsoleVersion;
 	public ActualResult Result;
 	public List<string> Errors;
 	public List<string> Warnings;
 
-	public PackageTestReport(PackageTest test, ActualResult actualResult)
+	public PackageTestReport(PackageTest test, string consoleVersion, ActualResult actualResult)
 	{
 		Test = test;
+		ConsoleVersion = consoleVersion;
 		Result = actualResult;
 		Errors = new List<string>();
 		Warnings = new List<string>();
@@ -55,9 +57,10 @@ public class PackageTestReport
 			Errors.Add($"   Found unexpected assembly {actualAssemblies[i].Name}");
 	}
 
-	public PackageTestReport(PackageTest test, Exception ex)
+	public PackageTestReport(PackageTest test, string consoleVersion, Exception ex)
 	{
 		Test = test;
+		ConsoleVersion = consoleVersion;
 		Result = null;
 		Errors = new List<string>();
 		Errors.Add($"     {ex.Message}");
@@ -67,7 +70,7 @@ public class PackageTestReport
 	{
 		Console.WriteLine();
 		Console.WriteLine($"{index}. {Test.Description}");
-		Console.WriteLine($"   ConsoleVersion: {Test.ConsoleVersion}");
+		Console.WriteLine($"   ConsoleVersion: {ConsoleVersion}");
 		Console.WriteLine($"   Args: {Test.Arguments}");
 		Console.WriteLine();
 

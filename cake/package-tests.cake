@@ -7,7 +7,7 @@
 public class PackageTest
 {
 	public string Description { get; set; }
-	public string ConsoleVersion { get; set; }
+	public string[] TestConsoleVersions { get; set; }
 	public string Arguments { get; set; }
 	public ExpectedResult ExpectedResult { get; set; }
 }
@@ -17,7 +17,7 @@ public class PackageTest
 //////////////////////////////////////////////////////////////////////
 
 const string DEFAULT_TEST_RESULT_FILE = "TestResult.xml";
-static readonly string[] TEST_CONSOLE_VERSIONS = new[] { "3.12.0", "3.11.1", "3.10.0" };
+
 public abstract class PackageTester
 {
 	protected BuildParameters _parameters;
@@ -28,60 +28,57 @@ public abstract class PackageTester
 		_parameters = parameters;
 		_context = parameters.Context;
 
-		foreach (var consoleVersion in TEST_CONSOLE_VERSIONS)
+		PackageTests.Add(new PackageTest()
 		{
-			PackageTests.Add(new PackageTest()
+			Description = "Project with one assembly, all tests pass",
+			Arguments = "PassingAssembly.nunit",
+			TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+			ExpectedResult = new ExpectedResult("Passed")
 			{
-				Description = "Project with one assembly, all tests pass",
-				Arguments = "PassingAssembly.nunit",
-				ConsoleVersion = consoleVersion,
-				ExpectedResult = new ExpectedResult("Passed")
-				{
-					Total = 4,
-					Passed = 4,
-					Failed = 0,
-					Warnings = 0,
-					Inconclusive = 0,
-					Skipped = 0,
-					Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-				}
-			});
-			PackageTests.Add(new PackageTest()
+				Total = 4,
+				Passed = 4,
+				Failed = 0,
+				Warnings = 0,
+				Inconclusive = 0,
+				Skipped = 0,
+				Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
+			}
+		});
+		PackageTests.Add(new PackageTest()
+		{
+			Description = "Project with one assembly, some failures",
+			Arguments = "FailingAssembly.nunit",
+			TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+			ExpectedResult = new ExpectedResult("Failed")
 			{
-				Description = "Project with one assembly, some failures",
-				Arguments = "FailingAssembly.nunit",
-				ConsoleVersion = consoleVersion,
-				ExpectedResult = new ExpectedResult("Failed")
-				{
-					Total = 9,
-					Passed = 4,
-					Failed = 2,
-					Warnings = 0,
-					Inconclusive = 1,
-					Skipped = 2,
-					Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
-				}
-			});
-			PackageTests.Add(new PackageTest()
+				Total = 9,
+				Passed = 4,
+				Failed = 2,
+				Warnings = 0,
+				Inconclusive = 1,
+				Skipped = 2,
+				Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
+			}
+		});
+		PackageTests.Add(new PackageTest()
+		{
+			Description = "Project with both assemblies",
+			Arguments = "BothAssemblies.nunit",
+			TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+			ExpectedResult = new ExpectedResult("Failed")
 			{
-				Description = "Project with both assemblies",
-				Arguments = "BothAssemblies.nunit",
-				ConsoleVersion = consoleVersion,
-				ExpectedResult = new ExpectedResult("Failed")
-				{
-					Total = 13,
-					Passed = 8,
-					Failed = 2,
-					Warnings = 0,
-					Inconclusive = 1,
-					Skipped = 2,
-					Assemblies = new[] {
-						new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
-						new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
-					}
+				Total = 13,
+				Passed = 8,
+				Failed = 2,
+				Warnings = 0,
+				Inconclusive = 1,
+				Skipped = 2,
+				Assemblies = new[] {
+					new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
+					new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
 				}
-			});
-		}
+			}
+		});
 	}
 
 	protected abstract string PackageName { get; }
@@ -98,32 +95,36 @@ public abstract class PackageTester
 		foreach (var packageTest in PackageTests)
 		{
 			var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
-			// Delete result file ahead of time so we don't mistakenly
-			// read a left-over file from another test run. Leave the
-			// file after the run in case we need it to debug a failure.
-			if (_context.FileExists(resultFile))
-				_context.DeleteFile(resultFile);
 
-			DisplayBanner(packageTest.Description + " - Console Version " + packageTest.ConsoleVersion);
-
-			RunConsoleTest(packageTest.ConsoleVersion, packageTest.Arguments);
-
-			try
+			foreach (var consoleVersion in packageTest.TestConsoleVersions)
 			{
-				var result = new ActualResult(_parameters.ProjectDirectory + DEFAULT_TEST_RESULT_FILE);
-				var report = new PackageTestReport(packageTest, result);
-				reporter.AddReport(report);
+				// Delete result file ahead of time so we don't mistakenly
+				// read a left-over file from another test run. Leave the
+				// file after the run in case we need it to debug a failure.
+				if (_context.FileExists(resultFile))
+					_context.DeleteFile(resultFile);
 
-				Console.WriteLine(report.Errors.Count == 0
-					? "\nSUCCESS: Test Result matches expected result!"
-					: "\nERROR: Test Result not as expected!");
-			}
-			catch (Exception ex)
-			{
-				reporter.AddReport(new PackageTestReport(packageTest, ex));
+				DisplayBanner(packageTest.Description + " - Console Version " + consoleVersion);
 
-				Console.WriteLine($"\nERROR: No result found.");
-				Console.WriteLine(ex.ToString());
+				RunConsoleTest(consoleVersion, packageTest.Arguments);
+
+				try
+				{
+					var result = new ActualResult(_parameters.ProjectDirectory + DEFAULT_TEST_RESULT_FILE);
+					var report = new PackageTestReport(packageTest, consoleVersion, result);
+					reporter.AddReport(report);
+
+					Console.WriteLine(report.Errors.Count == 0
+						? "\nSUCCESS: Test Result matches expected result!"
+						: "\nERROR: Test Result not as expected!");
+				}
+				catch (Exception ex)
+				{
+					reporter.AddReport(new PackageTestReport(packageTest, consoleVersion, ex));
+
+					Console.WriteLine($"\nERROR: No result found.");
+					Console.WriteLine(ex.ToString());
+				}
 			}
 		}
 
