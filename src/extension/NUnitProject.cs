@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Copyright (c) 2011 Charlie Poole
+// Copyright (c) 2011-2021 Charlie Poole
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -84,7 +84,8 @@ namespace NUnit.Engine.Services.ProjectLoaders
 
         public TestPackage GetTestPackage(string configName)
         {
-            var package = new TestPackage(ProjectPath);
+            var dummy = new TestPackage();
+            var package = dummy.AddSubPackage(ProjectPath);
             if (configName == null)
                 configName = ActiveConfigName;
 
@@ -99,7 +100,7 @@ namespace NUnit.Engine.Services.ProjectLoaders
                     string assembly = node.GetAttribute(PATH_ATTR);
                     if (basePath != null)
                         assembly = Path.Combine(basePath, assembly);
-                    package.AddSubPackage(new TestPackage(assembly));
+                    package.AddSubPackage(assembly);
                 }
 
                 var settings = GetSettingsForConfig(configNode);

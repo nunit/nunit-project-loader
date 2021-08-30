@@ -1,8 +1,12 @@
 #tool nuget:?package=GitVersion.CommandLine&version=5.0.0
+<<<<<<< HEAD
 #tool nuget:?package=GitReleaseManager&version=0.11.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
+=======
+#tool nuget:https://myget.org/F/testcentric/?package=NUnit.ConsoleRunner&version=4.0.0-dev-001&prerelease
+>>>>>>> 155098b (Create 4.0 Build)
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -22,6 +26,15 @@ const string DEFAULT_CONFIGURATION = "Release";
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS  
 //////////////////////////////////////////////////////////////////////
+
+// NOTE: These two constants are set here because constants.cake
+// isn't loaded until after the arguments are parsed.
+//
+// Since GitVersion is only used when running under
+// Windows, the default version should be updated to the
+// next version after each release.
+const string DEFAULT_VERSION = "4.0.0";
+const string DEFAULT_CONFIGURATION = "Release"; 
 
 var target = Argument("target", "Default");
 
@@ -119,7 +132,15 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
+<<<<<<< HEAD
 		NUnit3(parameters.OutputDirectory + "net20/nunit-project-loader.tests.dll");
+=======
+		int rc = StartProcess(parameters.OutputDirectory + "net20/" + UNIT_TEST_ASSEMBLY);
+		if (rc > 0)
+			throw new System.Exception($"{rc} tests failed");
+		else if (rc < 0)
+			throw new System.Exception($"Error code: {rc}");
+>>>>>>> 155098b (Create 4.0 Build)
 	});
 
 //////////////////////////////////////////////////////////////////////

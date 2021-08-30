@@ -10,11 +10,13 @@
 
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="nunit.engine.api" Version="3.11.1" />
+    <PackageReference Include="nunit.engine.api" Version="4.0.0-dev-001" />
     <!-- This is the newest NUnit that support .NET Framework 2.0 -->
     <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnitLite" Version="3.11.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\extension\nunit-project-loader.csproj" />
