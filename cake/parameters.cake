@@ -57,7 +57,7 @@ public class BuildParameters
 		//		var branch = appVeyor.Environment.Repository.Branch;
 		//		var isPullRequest = appVeyor.Environment.PullRequest.IsPullRequest;
 
-		//		if (branch == "master" && !isPullRequest)
+		//		if (branch == "main" && !isPullRequest)
 		//		{
 		//			PackageVersion = DEFAULT_VERSION + "-dev-" + buildNumber;
 		//			ShouldPublishToMyGet = true;
