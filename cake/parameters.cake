@@ -39,50 +39,6 @@ public class BuildParameters
 		GitHubAccessToken = _context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
 		BuildVersion = new BuildVersion(context, this);
-		//// Since we don't pass a version argument
-		//// in AppVeyor.yml, it will be set to the
-		//// default. We change it here.
-		//if (_context.BuildSystem().IsRunningOnAppVeyor)
-		//{
-		//	var appVeyor = _context.AppVeyor();
-		//	var tag = appVeyor.Environment.Repository.Tag;
-
-		//	if (tag.IsTag)
-		//	{
-		//		PackageVersion = tag.Name;
-		//	}
-		//	else
-		//	{
-		//		var buildNumber = appVeyor.Environment.Build.Number.ToString("00000");
-		//		var branch = appVeyor.Environment.Repository.Branch;
-		//		var isPullRequest = appVeyor.Environment.PullRequest.IsPullRequest;
-
-		//		if (branch == "main" && !isPullRequest)
-		//		{
-		//			PackageVersion = DEFAULT_VERSION + "-dev-" + buildNumber;
-		//			ShouldPublishToMyGet = true;
-		//		}
-		//		else
-		//		{
-		//			var suffix = "-ci-" + buildNumber;
-
-		//			if (isPullRequest)
-		//				suffix += "-pr-" + appVeyor.Environment.PullRequest.Number;
-		//			else
-		//				suffix += "-" + branch;
-
-		//			// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-		//			if (suffix.Length > 21)
-		//				suffix = suffix.Substring(0, 21);
-
-		//			suffix = suffix.Replace(".", "");
-
-		//			PackageVersion = DEFAULT_VERSION + suffix;
-		//		}
-
-		//      appVeyor.UpdateBuildVersion(PackageVersion + "-" + appVeyor.Environment.Build.Number);
-		//	}
-		//}
 	}
 
 	public string Target { get; }
@@ -103,7 +59,6 @@ public class BuildParameters
 	public bool IsLocalBuild => _buildSystem.IsLocalBuild;
 	public bool IsRunningOnUnix => _context.IsRunningOnUnix();
 	public bool IsRunningOnWindows => _context.IsRunningOnWindows();
-
 	public bool IsRunningOnAppVeyor => _buildSystem.AppVeyor.IsRunningOnAppVeyor;
 
 	public string ProjectDirectory { get; }

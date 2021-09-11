@@ -17,7 +17,6 @@ const string DEFAULT_VERSION = "3.7.0";
 const string DEFAULT_CONFIGURATION = "Release"; 
 
 var target = Argument("target", "Default");
-var packageVersion = Argument("version", DEFAULT_VERSION);
 
 // Load additional cake files here since some of them
 // depend on the arguments provided.
