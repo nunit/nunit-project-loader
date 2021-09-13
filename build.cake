@@ -3,24 +3,28 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
 
+////////////////////////////////////////////////////////////////////
+// CONSTANTS
+//////////////////////////////////////////////////////////////////////
+
+const string SOLUTION_FILE = "nunit-project-loader.sln";
+const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
+const string CHOCO_ID = "nunit-extension-nunit-project-loader";
+const string DEFAULT_VERSION = "3.7.0";
+const string DEFAULT_CONFIGURATION = "Release";
+
+// Load scripts after defining constants
+#load cake/parameters.cake
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS  
 //////////////////////////////////////////////////////////////////////
 
-// NOTE: These two constants are set here because constants.cake
-// isn't loaded until after the arguments are parsed.
-//
-// Since GitVersion is only used when running under
-// Windows, the default version should be updated to the
-// next version after each release.
-const string DEFAULT_VERSION = "3.7.0";
-const string DEFAULT_CONFIGURATION = "Release"; 
-
 var target = Argument("target", "Default");
 
-// Load additional cake files here since some of them
-// depend on the arguments provided.
-#load cake/parameters.cake
+// Additional arguments defined in the cake scripts:
+//   --configuration
+//   --version
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN
@@ -75,12 +79,16 @@ Task("CleanAll")
 
 Task("NuGetRestore")
     .Does(() =>
-{
-    NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
 	{
-		Source = PACKAGE_SOURCES
+		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
+		{
+			Source = new string[]
+			{
+				"https://www.nuget.org/api/v2",
+				"https://www.myget.org/F/nunit/api/v2"
+			}
+		});
 	});
-});
 
 //////////////////////////////////////////////////////////////////////
 // BUILD
@@ -118,8 +126,7 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
-		NUnit3(TEST_TARGET_FRAMEWORKS.Select(framework => System.IO.Path.Combine(
-			parameters.OutputDirectory, framework, UNIT_TEST_ASSEMBLY)));
+		NUnit3(parameters.OutputDirectory + "net20/nunit-project-loader.tests.dll");
 	});
 
 //////////////////////////////////////////////////////////////////////
