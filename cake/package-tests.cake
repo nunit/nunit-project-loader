@@ -27,72 +27,17 @@ public abstract class PackageTester
     {
 		_parameters = parameters;
 		_context = parameters.Context;
-
-		PackageTests.Add(new PackageTest()
-		{
-			Description = "Project with one assembly, all tests pass",
-			Arguments = "PassingAssembly.nunit",
-			TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
-			ExpectedResult = new ExpectedResult("Passed")
-			{
-				Total = 4,
-				Passed = 4,
-				Failed = 0,
-				Warnings = 0,
-				Inconclusive = 0,
-				Skipped = 0,
-				Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-			}
-		});
-		PackageTests.Add(new PackageTest()
-		{
-			Description = "Project with one assembly, some failures",
-			Arguments = "FailingAssembly.nunit",
-			TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
-			ExpectedResult = new ExpectedResult("Failed")
-			{
-				Total = 9,
-				Passed = 4,
-				Failed = 2,
-				Warnings = 0,
-				Inconclusive = 1,
-				Skipped = 2,
-				Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
-			}
-		});
-		PackageTests.Add(new PackageTest()
-		{
-			Description = "Project with both assemblies",
-			Arguments = "BothAssemblies.nunit",
-			TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
-			ExpectedResult = new ExpectedResult("Failed")
-			{
-				Total = 13,
-				Passed = 8,
-				Failed = 2,
-				Warnings = 0,
-				Inconclusive = 1,
-				Skipped = 2,
-				Assemblies = new[] {
-					new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
-					new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
-				}
-			}
-		});
 	}
 
 	protected abstract string PackageName { get; }
 	protected abstract string PackageUnderTest { get; }
 	public abstract string InstallDirectory { get; }
 
-	public PackageCheck[] PackageChecks { get; set; }
-	public List<PackageTest> PackageTests = new List<PackageTest>();
-
-	public void RunPackageTests()
+	public void RunPackageTests(IList<PackageTest> packageTests)
     {
 		var reporter = new ResultReporter(PackageName);
 
-		foreach (var packageTest in PackageTests)
+		foreach (var packageTest in packageTests)
 		{
 			var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
 
