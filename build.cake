@@ -3,24 +3,28 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
 
+////////////////////////////////////////////////////////////////////
+// CONSTANTS
+//////////////////////////////////////////////////////////////////////
+
+const string SOLUTION_FILE = "nunit-project-loader.sln";
+const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
+const string CHOCO_ID = "nunit-extension-nunit-project-loader";
+const string DEFAULT_VERSION = "3.7.0";
+const string DEFAULT_CONFIGURATION = "Release";
+
+// Load scripts after defining constants
+#load cake/parameters.cake
+
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS  
 //////////////////////////////////////////////////////////////////////
 
-// NOTE: These two constants are set here because constants.cake
-// isn't loaded until after the arguments are parsed.
-//
-// Since GitVersion is only used when running under
-// Windows, the default version should be updated to the
-// next version after each release.
-const string DEFAULT_VERSION = "3.7.0";
-const string DEFAULT_CONFIGURATION = "Release"; 
-
 var target = Argument("target", "Default");
 
-// Load additional cake files here since some of them
-// depend on the arguments provided.
-#load cake/parameters.cake
+// Additional arguments defined in the cake scripts:
+//   --configuration
+//   --version
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN
@@ -53,11 +57,21 @@ Task("DumpSettings")
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
-    .Does<BuildParameters>((parameters) =>
-{
-    CleanDirectory(parameters.OutputDirectory);
-});
+	.Does<BuildParameters>((parameters) =>
+	{
+		Information("Cleaning " + parameters.OutputDirectory);
+		CleanDirectory(parameters.OutputDirectory);
+	});
 
+Task("CleanAll")
+	.Does<BuildParameters>((parameters) =>
+	{
+		Information("Cleaning all output directories");
+		CleanDirectory(parameters.ProjectDirectory + "bin/");
+
+		Information("Deleting object directories");
+		DeleteObjectDirectories(parameters);
+	});
 
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
@@ -65,12 +79,16 @@ Task("Clean")
 
 Task("NuGetRestore")
     .Does(() =>
-{
-    NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
 	{
-		Source = PACKAGE_SOURCES
+		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
+		{
+			Source = new string[]
+			{
+				"https://www.nuget.org/api/v2",
+				"https://www.myget.org/F/nunit/api/v2"
+			}
+		});
 	});
-});
 
 //////////////////////////////////////////////////////////////////////
 // BUILD
@@ -108,8 +126,7 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
-		NUnit3(TEST_TARGET_FRAMEWORKS.Select(framework => System.IO.Path.Combine(
-			parameters.OutputDirectory, framework, UNIT_TEST_ASSEMBLY)));
+		NUnit3(parameters.OutputDirectory + "net20/nunit-project-loader.tests.dll");
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -125,9 +142,12 @@ Task("BuildNuGetPackage")
 	});
 
 Task("InstallNuGetPackage")
-	.IsDependentOn("RemoveChocolateyPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
+		// Ensure we aren't inadvertently using the chocolatey install
+		if (DirectoryExists(parameters.ChocolateyInstallDirectory))
+			DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+
 		CleanDirectory(parameters.NuGetInstallDirectory);
 		Unzip(parameters.NuGetPackage, parameters.NuGetInstallDirectory);
 
@@ -148,15 +168,7 @@ Task("TestNuGetPackage")
 	.IsDependentOn("InstallNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		new NuGetPackageTester(parameters).RunPackageTests();
-	});
-
-Task("RemoveNuGetPackageIfPresent")
-	.Does<BuildParameters>((parameters) =>
-	{
-		if(DirectoryExists(parameters.NuGetInstallDirectory))
-			DeleteDirectory(parameters.NuGetInstallDirectory,
-				new DeleteDirectorySettings() { Recursive = true });
+		new NuGetPackageTester(parameters).RunPackageTests(PackageTests);
 	});
 
 Task("BuildChocolateyPackage")
@@ -169,9 +181,12 @@ Task("BuildChocolateyPackage")
 	});
 
 Task("InstallChocolateyPackage")
-	.IsDependentOn("RemoveNuGetPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
+		// Ensure we aren't inadvertently using the nuget install
+		if (DirectoryExists(parameters.NuGetInstallDirectory))
+			DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+
 		CleanDirectory(parameters.ChocolateyInstallDirectory);
 		Unzip(parameters.ChocolateyPackage, parameters.ChocolateyInstallDirectory);
 
@@ -192,16 +207,63 @@ Task("TestChocolateyPackage")
 	.IsDependentOn("InstallChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		new ChocolateyPackageTester(parameters).RunPackageTests();
+		new ChocolateyPackageTester(parameters).RunPackageTests(PackageTests);
 	});
 
-Task("RemoveChocolateyPackageIfPresent")
-	.Does<BuildParameters>((parameters) =>
+PackageTest[] PackageTests = new PackageTest[]
+{
+	new PackageTest()
 	{
-		if (DirectoryExists(parameters.ChocolateyInstallDirectory))
-			DeleteDirectory(parameters.ChocolateyInstallDirectory,
-				new DeleteDirectorySettings() { Recursive = true });
-	});
+		Description = "Project with one assembly, all tests pass",
+		Arguments = "PassingAssembly.nunit",
+		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+		ExpectedResult = new ExpectedResult("Passed")
+		{
+			Total = 4,
+			Passed = 4,
+			Failed = 0,
+			Warnings = 0,
+			Inconclusive = 0,
+			Skipped = 0,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Project with one assembly, some failures",
+		Arguments = "FailingAssembly.nunit",
+		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Total = 9,
+			Passed = 4,
+			Failed = 2,
+			Warnings = 0,
+			Inconclusive = 1,
+			Skipped = 2,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Project with both assemblies",
+		Arguments = "BothAssemblies.nunit",
+		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Total = 13,
+			Passed = 8,
+			Failed = 2,
+			Warnings = 0,
+			Inconclusive = 1,
+			Skipped = 2,
+			Assemblies = new[] {
+				new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
+				new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
+			}
+		}
+	}
+};
 
 //////////////////////////////////////////////////////////////////////
 // PUBLISH
