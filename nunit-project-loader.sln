@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-A
 		cake\parameters.cake = cake\parameters.cake
 		cake\test-reports.cake = cake\test-reports.cake
 		cake\test-results.cake = cake\test-results.cake
+		cake\utilities.cake = cake\utilities.cake
 		cake\versioning.cake = cake\versioning.cake
 	EndProjectSection
 EndProject
