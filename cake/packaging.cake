@@ -8,7 +8,7 @@ static readonly string[] OWNERS = new[] { "Charlie Poole" };
 const string DESCRIPTION = "This extension allows NUnit to create result files in the V2 format, which is used by many CI servers.";
 const string SUMMARY = "NUnit Engine extension for writing test result files in NUnit V2 format.";
 const string COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-static readonly string[] RELEASE_NOTES = new[] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.txt" };
+static readonly string[] RELEASE_NOTES = new[] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.md" };
 static readonly string[] TAGS = new[] { "nunit", "test", "testing", "tdd", "runner" };
 static readonly Uri PROJECT_URL = new Uri("http://nunit.org");
 static readonly Uri ICON_URL = new Uri("https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png");
@@ -29,7 +29,7 @@ public void BuildNuGetPackage(BuildParameters parameters)
 {
 		var content = new List<NuSpecContent>();
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" });
-		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt" });
+		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.md" });
 		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools" });
 
 	NuGetPack(
@@ -66,7 +66,7 @@ public void BuildChocolateyPackage(BuildParameters parameters)
 {
     var content = new List<ChocolateyNuSpecContent>();
     content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt", Target = "tools" });
-    content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" });
+    content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.md", Target = "tools" });
     content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" });
 	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools" });
 

@@ -1,4 +1,5 @@
 #tool nuget:?package=GitVersion.CommandLine&version=5.0.0
+#tool nuget:?package=GitReleaseManager&version=0.11.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
@@ -12,7 +13,7 @@ const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 const string CHOCO_ID = "nunit-extension-nunit-project-loader";
 const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-project-loader";
-const string DEFAULT_VERSION = "3.8.0";
+const string DEFAULT_VERSION = "3.7.1";
 const string DEFAULT_CONFIGURATION = "Release";
 
 // Load scripts after defining constants
@@ -26,7 +27,7 @@ var target = Argument("target", "Default");
 
 // Additional arguments defined in the cake scripts:
 //   --configuration
-//   --version
+//   --packageVersion
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN
@@ -63,16 +64,6 @@ Task("Clean")
 	{
 		Information("Cleaning " + parameters.OutputDirectory);
 		CleanDirectory(parameters.OutputDirectory);
-	});
-
-Task("CleanAll")
-	.Does<BuildParameters>((parameters) =>
-	{
-		Information("Cleaning all output directories");
-		CleanDirectory(parameters.ProjectDirectory + "bin/");
-
-		Information("Deleting object directories");
-		DeleteObjectDirectories(parameters);
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -161,7 +152,7 @@ Task("VerifyNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		Check.That(parameters.NuGetInstallDirectory,
-			HasFiles("CHANGES.txt", "LICENSE.txt"),
+			HasFiles("CHANGES.md", "LICENSE.txt"),
 			HasDirectory("tools").WithFile("nunit-project-loader.dll"));
 		Information("Verification was successful!");
 	});
@@ -201,7 +192,7 @@ Task("VerifyChocolateyPackage")
 	{
 		Check.That(parameters.ChocolateyInstallDirectory,
 			HasDirectory("tools").WithFiles(
-				"CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll"));
+				"CHANGES.md", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll"));
 		Information("Verification was successful!");
 	});
 
@@ -383,21 +374,6 @@ Task("CreateDraftRelease")
 		}
 	});
 
-Task("ExportDraftRelease")
-	.Description("Export draft release locally for use in updating CHANGES.md")
-	.Does<BuildParameters>((parameters) =>
-	{
-		if (parameters.IsReleaseBranch && parameters.IsLocalBuild)
-		{
-			string milestone = parameters.BranchName.Substring(8);
-
-			GitReleaseManagerExport(parameters.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, "DraftRelease.md",
-				new GitReleaseManagerExportSettings() { TagName = milestone });
-		}
-		else
-			Error("ExportDraftRelease may only be run locally, using a release branch!");
-	});
-
 //////////////////////////////////////////////////////////////////////
 // CREATE A PRODUCTION RELEASE
 //////////////////////////////////////////////////////////////////////
@@ -455,7 +431,9 @@ Task("Appveyor")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
 	.IsDependentOn("Package")
-	.IsDependentOn("PublishPackages");
+	.IsDependentOn("PublishPackages")
+	.IsDependentOn("CreateDraftRelease")
+	.IsDependentOn("CreateProductionRelease");
 
 Task("Default")
     .IsDependentOn("Build");
