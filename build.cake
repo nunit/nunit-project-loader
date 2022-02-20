@@ -1,8 +1,5 @@
 #tool nuget:?package=GitVersion.CommandLine&version=5.0.0
-#tool nuget:?package=GitReleaseManager&version=0.11.0
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
+#tool nuget:https://myget.org/F/nunit/?package=NUnit.ConsoleRunner&version=4.0.0-dev00051&prerelease
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -15,6 +12,7 @@ const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-project-loader";
 const string DEFAULT_VERSION = "3.7.1";
 const string DEFAULT_CONFIGURATION = "Release";
+const string LATEST_CONSOLE_DEV_VERSION = "4.0.0-dev00051";
 
 // Load scripts after defining constants
 #load cake/parameters.cake
@@ -119,7 +117,11 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
-		NUnit3(parameters.OutputDirectory + "net20/nunit-project-loader.tests.dll");
+		int rc = StartProcess(parameters.OutputDirectory + "net20/nunit-project-loader.tests.exe");
+		if (rc > 0)
+			throw new System.Exception($"{rc} tests failed");
+		else if (rc < 0)
+			throw new System.Exception($"Error code: {rc}");
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -205,57 +207,57 @@ Task("TestChocolateyPackage")
 
 PackageTest[] PackageTests = new PackageTest[]
 {
-	new PackageTest()
-	{
-		Description = "Project with one assembly, all tests pass",
-		Arguments = "PassingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
-		ExpectedResult = new ExpectedResult("Passed")
+		new PackageTest()
 		{
-			Total = 4,
-			Passed = 4,
-			Failed = 0,
-			Warnings = 0,
-			Inconclusive = 0,
-			Skipped = 0,
-			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-		}
-	},
-	new PackageTest()
-	{
-		Description = "Project with one assembly, some failures",
-		Arguments = "FailingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
-		ExpectedResult = new ExpectedResult("Failed")
+			Description = "Project with one assembly, all tests pass",
+			Arguments = "PassingAssembly.nunit",
+			TestConsoleVersions = new string[] { LATEST_CONSOLE_DEV_VERSION },
+			ExpectedResult = new ExpectedResult("Passed")
+			{
+				Total = 4,
+				Passed = 4,
+				Failed = 0,
+				Warnings = 0,
+				Inconclusive = 0,
+				Skipped = 0,
+				Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
+			}
+		},
+		new PackageTest()
 		{
-			Total = 9,
-			Passed = 4,
-			Failed = 2,
-			Warnings = 0,
-			Inconclusive = 1,
-			Skipped = 2,
-			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
-		}
-	},
-	new PackageTest()
-	{
-		Description = "Project with both assemblies",
-		Arguments = "BothAssemblies.nunit",
-		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
-		ExpectedResult = new ExpectedResult("Failed")
+			Description = "Project with one assembly, some failures",
+			Arguments = "FailingAssembly.nunit",
+			TestConsoleVersions = new string[] { LATEST_CONSOLE_DEV_VERSION },
+			ExpectedResult = new ExpectedResult("Failed")
+			{
+				Total = 9,
+				Passed = 4,
+				Failed = 2,
+				Warnings = 0,
+				Inconclusive = 1,
+				Skipped = 2,
+				Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
+			}
+		},
+		new PackageTest()
 		{
-			Total = 13,
-			Passed = 8,
-			Failed = 2,
-			Warnings = 0,
-			Inconclusive = 1,
-			Skipped = 2,
-			Assemblies = new[] {
-				new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
-				new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
+			Description = "Project with both assemblies",
+			Arguments = "BothAssemblies.nunit",
+			TestConsoleVersions = new string[] { LATEST_CONSOLE_DEV_VERSION },
+			ExpectedResult = new ExpectedResult("Failed")
+			{
+				Total = 13,
+				Passed = 8,
+				Failed = 2,
+				Warnings = 0,
+				Inconclusive = 1,
+				Skipped = 2,
+				Assemblies = new[] {
+					new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
+					new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
+				}
 			}
 		}
-	}
 };
 
 //////////////////////////////////////////////////////////////////////
