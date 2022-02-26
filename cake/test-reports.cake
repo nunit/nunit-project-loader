@@ -23,38 +23,41 @@ public class PackageTestReport
 
 		ReportMissingFiles();
 
-		if (actualResult.OverallResult == null)
-			Errors.Add("   The test-run element has no result attribute.");
-		else if (expectedResult.OverallResult != actualResult.OverallResult)
-			Errors.Add($"   Expected: Overall Result = {expectedResult.OverallResult} But was: {actualResult.OverallResult}");
-		CheckCounter("Test Count", expectedResult.Total, actualResult.Total);
-		CheckCounter("Passed", expectedResult.Passed, actualResult.Passed);
-		CheckCounter("Failed", expectedResult.Failed, actualResult.Failed);
-		CheckCounter("Warnings", expectedResult.Warnings, actualResult.Warnings);
-		CheckCounter("Inconclusive", expectedResult.Inconclusive, actualResult.Inconclusive);
-		CheckCounter("Skipped", expectedResult.Skipped, actualResult.Skipped);
+		if (expectedResult != null)
+		{
+			if (actualResult.OverallResult == null)
+				Errors.Add("   The test-run element has no result attribute.");
+			else if (expectedResult.OverallResult != actualResult.OverallResult)
+				Errors.Add($"   Expected: Overall Result = {expectedResult.OverallResult} But was: {actualResult.OverallResult}");
+			CheckCounter("Test Count", expectedResult.Total, actualResult.Total);
+			CheckCounter("Passed", expectedResult.Passed, actualResult.Passed);
+			CheckCounter("Failed", expectedResult.Failed, actualResult.Failed);
+			CheckCounter("Warnings", expectedResult.Warnings, actualResult.Warnings);
+			CheckCounter("Inconclusive", expectedResult.Inconclusive, actualResult.Inconclusive);
+			CheckCounter("Skipped", expectedResult.Skipped, actualResult.Skipped);
 
-		var expectedAssemblies = expectedResult.Assemblies;
-		var actualAssemblies = actualResult.Assemblies;
+			var expectedAssemblies = expectedResult.Assemblies;
+			var actualAssemblies = actualResult.Assemblies;
 
-		for (int i = 0; i < expectedAssemblies.Length && i < actualAssemblies.Length; i++)
-        {
-			var expected = expectedAssemblies[i];
-			var actual = actualAssemblies[i];
+			for (int i = 0; i < expectedAssemblies.Length && i < actualAssemblies.Length; i++)
+			{
+				var expected = expectedAssemblies[i];
+				var actual = actualAssemblies[i];
 
-			if (expected.Name != actual.Name)
-				Errors.Add($"   Expected: {expected.Name} But was: { actual.Name}");
-			else if (actual.Runtime == null)
-				Warnings.Add($"Unable to determine actual runtime used for {expected.Name}");
-			else if (!expected.Runtime.StartsWith(actual.Runtime))
-				Errors.Add($"   Assembly {actual.Name} Expected: {expected.Runtime} But was: {actual.Runtime}");
-        }
+				if (expected.Name != actual.Name)
+					Errors.Add($"   Expected: {expected.Name} But was: { actual.Name}");
+				else if (actual.Runtime == null)
+					Warnings.Add($"Unable to determine actual runtime used for {expected.Name}");
+				else if (!expected.Runtime.StartsWith(actual.Runtime))
+					Errors.Add($"   Assembly {actual.Name} Expected: {expected.Runtime} But was: {actual.Runtime}");
+			}
 
-		for (int i = actualAssemblies.Length; i < expectedAssemblies.Length; i++)
-			Errors.Add($"   Assembly {expectedAssemblies[i].Name} was not found");
+			for (int i = actualAssemblies.Length; i < expectedAssemblies.Length; i++)
+				Errors.Add($"   Assembly {expectedAssemblies[i].Name} was not found");
 
-		for (int i = expectedAssemblies.Length; i < actualAssemblies.Length; i++)
-			Errors.Add($"   Found unexpected assembly {actualAssemblies[i].Name}");
+			for (int i = expectedAssemblies.Length; i < actualAssemblies.Length; i++)
+				Errors.Add($"   Found unexpected assembly {actualAssemblies[i].Name}");
+		}
 	}
 
 	public PackageTestReport(PackageTest test, string consoleVersion, Exception ex)
@@ -63,7 +66,8 @@ public class PackageTestReport
 		ConsoleVersion = consoleVersion;
 		Result = null;
 		Errors = new List<string>();
-		Errors.Add($"     {ex.Message}");
+		if (ex.Message != test.ExpectedError)
+			Errors.Add($"     {ex.Message}");
 	}
 
 	public void Display(int index)
@@ -115,7 +119,8 @@ public class PackageTestReport
 			if (runState == "NotRunnable" || suiteResult == "Failed" && site == "Test" && (label == "Invalid" || label == "Error"))
 			{
 				string message = suite.SelectSingleNode("reason/message")?.InnerText;
-				Errors.Add($"   {message}");
+				if (message != Test.ExpectedError)
+					Errors.Add($"   {message}");
 			}
 		}
 	}

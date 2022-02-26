@@ -45,7 +45,8 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
         public void CheckExtensionAttribute()
         {
             Assert.That(typeof(NUnitProjectLoader),
-                Has.Attribute<ExtensionAttribute>());
+                Has.Attribute<ExtensionAttribute>()
+                    .With.Property("EngineVersion").EqualTo("4.0"));
         }
 
         [Test]

@@ -28,7 +28,7 @@ using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services.ProjectLoaders
 {
-    [Extension]
+    [Extension(EngineVersion = "4.0")]
     [ExtensionProperty("FileExtension", ".nunit")]
     public class NUnitProjectLoader : IProjectLoader
     {

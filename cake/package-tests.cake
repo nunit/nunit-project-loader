@@ -10,7 +10,8 @@ public class PackageTest
 	public string[] TestConsoleVersions { get; set; }
 	public string Arguments { get; set; }
 	public ExpectedResult ExpectedResult { get; set; }
-}
+	public string ExpectedError { get; set; }
+} 
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE TESTER
