@@ -1,5 +1,6 @@
 #tool nuget:?package=GitVersion.CommandLine&version=5.0.0
 #tool nuget:https://myget.org/F/nunit/?package=NUnit.ConsoleRunner&version=4.0.0-dev00051&prerelease
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.15.0
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -13,6 +14,7 @@ const string GITHUB_REPO = "nunit-project-loader";
 const string DEFAULT_VERSION = "3.7.1";
 const string DEFAULT_CONFIGURATION = "Release";
 const string LATEST_CONSOLE_DEV_VERSION = "4.0.0-dev00051";
+const string PRE_4_0_CONSOLE_VERSION = "3.15.0";
 
 // Load scripts after defining constants
 #load cake/parameters.cake
@@ -207,6 +209,13 @@ Task("TestChocolateyPackage")
 
 PackageTest[] PackageTests = new PackageTest[]
 {
+		new PackageTest()
+		{
+			Description = "Older Version of console cannot load extension",
+			Arguments = "PassingAssembly.nunit",
+			TestConsoleVersions = new string[] { PRE_4_0_CONSOLE_VERSION },
+			ExpectedError = "File type is not supported"
+		},
 		new PackageTest()
 		{
 			Description = "Project with one assembly, all tests pass",
