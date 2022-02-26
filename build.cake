@@ -11,7 +11,7 @@ const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 const string CHOCO_ID = "nunit-extension-nunit-project-loader";
 const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-project-loader";
-const string DEFAULT_VERSION = "3.7.1";
+const string DEFAULT_VERSION = "4.0.0";
 const string DEFAULT_CONFIGURATION = "Release";
 const string LATEST_CONSOLE_DEV_VERSION = "4.0.0-dev00051";
 const string PRE_4_0_CONSOLE_VERSION = "3.15.0";
@@ -271,7 +271,7 @@ PackageTest[] PackageTests = new PackageTest[]
 
 //////////////////////////////////////////////////////////////////////
 // PUBLISH
-//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////d
 
 static bool hadPublishingErrors = false;
 
