@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- If adding/updating TargetFrameworks, also update build.cake -->
-    <!-- Even though we don't support running tests build for netcoreapp2.1 yet, we still build for it -->
-    <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net20</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit-project-loader.tests</AssemblyName>
