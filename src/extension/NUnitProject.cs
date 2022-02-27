@@ -227,9 +227,9 @@ namespace NUnit.Engine.Services.ProjectLoaders
             if (basePath != ProjectPath)
                 settings[RunnerSettings.BasePath] = basePath;
 
-            string configFile = configNode.GetAttribute(CONFIGFILE_ATTR);
-            if (configFile != null)
-                settings[RunnerSettings.ConfigurationFile] = configFile;
+            settings[RunnerSettings.ConfigurationFile] = 
+                configNode.GetAttribute(CONFIGFILE_ATTR) ??
+                Path.ChangeExtension(ProjectPath, ".config");
 
             string binpath = configNode.GetAttribute(BINPATH_ATTR);
             if (binpath != null)

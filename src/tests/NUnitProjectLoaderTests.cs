@@ -58,11 +58,12 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                     .And.Property("Value").EqualTo(".nunit"));
         }
 
-        [Test]
-        public void CheckExtension()
+        [TestCase("dummy.nunit", ExpectedResult = true)]
+        [TestCase("dummy.dll", ExpectedResult = false)]
+        [TestCase("dummy.junk", ExpectedResult = false)]
+        public bool CheckExtension(string fileName)
         {
-            Assert.That(_loader.CanLoadFrom("dummy.nunit"));
-            Assert.False(_loader.CanLoadFrom("dummy.junk"));
+            return _loader.CanLoadFrom(fileName);
         }
 
         [Test]
@@ -92,12 +93,10 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 Assert.AreEqual(new string[] { "Debug", "Release" }, project.ConfigNames);
 
                 TestPackage package1 = project.GetTestPackage("Debug");
-                Assert.AreEqual(2, package1.Settings.Count);
                 Assert.AreEqual(true, package1.Settings["AutoBinPath"], "AutoBinPath");
                 Assert.AreEqual(projectDir, package1.Settings["BasePath"], "BasePath");
 
                 TestPackage package2 = project.GetTestPackage("Release");
-                Assert.AreEqual(2, package2.Settings.Count);
                 Assert.AreEqual(true, package2.Settings["AutoBinPath"], "AutoBinPath");
                 Assert.AreEqual(projectDir, package1.Settings["BasePath"], "BasePath");
             }
@@ -129,12 +128,10 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                     Path.Combine(debugDir, "assembly2.dll"),
                     package1.SubPackages[1].FullName);
 
-                Assert.AreEqual(2, package1.Settings.Count);
                 Assert.AreEqual(debugDir, package1.Settings["BasePath"], "BasePath");
                 Assert.AreEqual(true, package1.Settings["AutoBinPath"], "AutoBinPath");
 
                 TestPackage package2 = _project.GetTestPackage("Release");
-                Assert.AreEqual(2, package2.SubPackages.Count);
                 Assert.AreEqual(
                     Path.Combine(releaseDir, "assembly1.dll"),
                     package2.SubPackages[0].FullName);
@@ -142,7 +139,6 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                     Path.Combine(releaseDir, "assembly2.dll"),
                     package2.SubPackages[1].FullName);
 
-                Assert.AreEqual(2, package2.Settings.Count);
                 Assert.AreEqual(releaseDir, package2.Settings["BasePath"]);
                 Assert.AreEqual(true, package2.Settings["AutoBinPath"]);
 
@@ -163,7 +159,6 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 Assert.AreEqual(1, project.ConfigNames.Count);
 
                 TestPackage package1 = project.GetTestPackage("Debug");
-                Assert.AreEqual(2, package1.Settings.Count);
                 Assert.AreEqual("bin_path_value", package1.Settings["PrivateBinPath"], "PrivateBinPath");
                 Assert.AreEqual(projectDir, package1.Settings["BasePath"], "BasePath");
             }
@@ -184,7 +179,6 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 Assert.AreEqual(2, project.ConfigNames.Count);
 
                 TestPackage package1 = project.GetTestPackage("Debug");
-                Assert.AreEqual(3, package1.Settings.Count);
                 Assert.AreEqual(debugDir, package1.Settings["BasePath"]);
                 Assert.AreEqual(true, package1.Settings["AutoBinPath"]);
                 Assert.AreEqual("v2.0", package1.Settings["RuntimeFramework"]);
@@ -198,7 +192,6 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                     package1.SubPackages[1].FullName);
 
                 TestPackage package2 = project.GetTestPackage("Release");
-                Assert.AreEqual(3, package2.Settings.Count);
                 Assert.AreEqual(releaseDir, package2.Settings["BasePath"]);
                 Assert.AreEqual(true, package2.Settings["AutoBinPath"]);
                 Assert.AreEqual("v4.0", package2.Settings["RuntimeFramework"]);
@@ -210,6 +203,31 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 Assert.AreEqual(
                     Path.Combine(releaseDir, "assembly2.dll"),
                     package2.SubPackages[1].FullName);
+            }
+        }
+
+        [Test]
+        public void DefaultConfigFile()
+        {
+            using (TestResource file = new TestResource("NUnitProject.nunit"))
+            {
+                IProject project = _loader.LoadFrom(file.Path);
+                TestPackage package = project.GetTestPackage("Debug");
+                Assert.That(package.Settings.ContainsKey("ConfigurationFile"), "No ConfigurationFile setting found");
+                Assert.That(package.Settings["ConfigurationFile"], Is.EqualTo(Path.ChangeExtension(file.Path, ".config")));
+            }
+        }
+
+        [TestCase("NUnitProject_ConfigFilePerConfig.nunit", "Debug", "D.config")]
+        [TestCase("NUnitProject_ConfigFilePerConfig.nunit", "Release", "R.config")]
+        public void CanSpecifyConfigFilePerConfig(string projectName, string config, string expectedFile)
+        {
+            using (TestResource file = new TestResource(projectName))
+            {
+                IProject project = _loader.LoadFrom(file.Path);
+                TestPackage package = project.GetTestPackage(config);
+                Assert.That(package.Settings.ContainsKey("ConfigurationFile"), "No ConfigurationFile setting found");
+                Assert.That(package.Settings["ConfigurationFile"], Is.EqualTo(expectedFile));
             }
         }
     }
