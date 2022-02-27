@@ -181,8 +181,6 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 TestPackage package1 = project.GetTestPackage("Debug");
                 Assert.AreEqual(debugDir, package1.Settings["BasePath"]);
                 Assert.AreEqual(true, package1.Settings["AutoBinPath"]);
-                Assert.AreEqual("Separate", package1.Settings["ProcessModel"]);
-                Assert.AreEqual("Multiple", package1.Settings["DomainUsage"]);
                 Assert.AreEqual("v2.0", package1.Settings["RuntimeFramework"]);
 
                 Assert.AreEqual(2, package1.SubPackages.Count);
@@ -196,8 +194,6 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 TestPackage package2 = project.GetTestPackage("Release");
                 Assert.AreEqual(releaseDir, package2.Settings["BasePath"]);
                 Assert.AreEqual(true, package2.Settings["AutoBinPath"]);
-                Assert.AreEqual("Separate", package2.Settings["ProcessModel"]);
-                Assert.AreEqual("Multiple", package2.Settings["DomainUsage"]);
                 Assert.AreEqual("v4.0", package2.Settings["RuntimeFramework"]);
 
                 Assert.AreEqual(2, package2.SubPackages.Count);

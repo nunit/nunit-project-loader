@@ -1,5 +1,5 @@
 ﻿<NUnitProject>
-  <Settings activeconfig="Release" appbase="bin" processModel="Separate" domainUsage="Multiple" />
+  <Settings activeconfig="Release" appbase="bin" />
   <Config name="Debug" appbase="debug" binpathtype="Auto" runtimeFramework="v2.0">
     <assembly path="assembly1.dll" />
     <assembly path="assembly2.dll" />
