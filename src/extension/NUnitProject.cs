@@ -156,16 +156,6 @@ namespace NUnit.Engine.Services.ProjectLoaders
         internal string RuntimeFramework { get; private set; }
 
         /// <summary>
-        /// The specified process model, or null
-        /// </summary>
-        internal string ProcessModel { get; private set; }
-
-        /// <summary>
-        /// The specified domain usage, or null
-        /// </summary>
-        internal string DomainUsage { get; private set; }
-
-        /// <summary>
         /// The project base path (Appbase)
         /// </summary>
         internal string ProjectBase { get; private set; }
@@ -183,8 +173,6 @@ namespace NUnit.Engine.Services.ProjectLoaders
             if (SettingsNode != null)
             {
                 ActiveConfigName = SettingsNode.GetAttribute(ACTIVECONFIG_ATTR);
-                ProcessModel = SettingsNode.GetAttribute(PROCESS_ATTR);
-                DomainUsage = SettingsNode.GetAttribute(DOMAIN_ATTR);
                 ProjectBase = SettingsNode.GetAttribute(APPBASE_ATTR);
             }
 
@@ -254,12 +242,6 @@ namespace NUnit.Engine.Services.ProjectLoaders
             string runtime = configNode.GetAttribute(RUNTIME_ATTR);
             if (runtime != null)
                 settings[RunnerSettings.RuntimeFramework] = runtime;
-
-            if (ProcessModel != null)
-                settings[RunnerSettings.ProcessModel] = ProcessModel;
-
-            if (DomainUsage != null)
-                settings[RunnerSettings.DomainUsage] = DomainUsage;
 
             return settings;
         }
