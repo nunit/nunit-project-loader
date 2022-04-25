@@ -11,6 +11,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="nunit.engine.api" Version="4.0.0-dev-001" />
+    <PackageReference Include="nunit.engine.api" Version="4.0.0-dev00102" />
   </ItemGroup>
 </Project>
