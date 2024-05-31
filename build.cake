@@ -1,3 +1,4 @@
+#tool NuGet.CommandLine&version=6.9.1
 #tool nuget:?package=GitVersion.CommandLine&version=5.6.3
 #tool nuget:?package=GitReleaseManager&version=0.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
