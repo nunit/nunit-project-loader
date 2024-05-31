@@ -1,8 +1,7 @@
-#tool nuget:?package=GitVersion.CommandLine&version=5.0.0
-#tool nuget:?package=GitReleaseManager&version=0.11.0
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
+#tool nuget:?package=GitVersion.CommandLine&version=5.6.3
+#tool nuget:?package=GitReleaseManager&version=0.17.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -64,6 +63,8 @@ Task("Clean")
 	{
 		Information("Cleaning " + parameters.OutputDirectory);
 		CleanDirectory(parameters.OutputDirectory);
+		Information("Cleaning " + parameters.PackageDirectory);
+		CleanDirectory(parameters.PackageDirectory);
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -209,7 +210,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with one assembly, all tests pass",
 		Arguments = "PassingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+		TestConsoleVersions = new string[] { "3.17.0", "3.15.5" },
 		ExpectedResult = new ExpectedResult("Passed")
 		{
 			Total = 4,
@@ -225,7 +226,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with one assembly, some failures",
 		Arguments = "FailingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+		TestConsoleVersions = new string[] { "3.17.0", "3.15.5" },
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 			Total = 9,
@@ -241,7 +242,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with both assemblies",
 		Arguments = "BothAssemblies.nunit",
-		TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
+		TestConsoleVersions = new string[] { "3.17.0", "3.15.5" },
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 			Total = 13,
@@ -253,6 +254,62 @@ PackageTest[] PackageTests = new PackageTest[]
 			Assemblies = new[] {
 				new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
 				new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
+		////new PackageTest()
+		////{
+		////	Description = "Older Version of console cannot load extension",
+		////	Arguments = "PassingAssembly.nunit",
+		////	TestConsoleVersions = new string[] { PRE_4_0_CONSOLE_VERSION },
+		////	ExpectedError = "File type is not supported"
+		////},
+		//new PackageTest()
+		//{
+		//	Description = "Project with one assembly, all tests pass",
+		//	Arguments = "PassingAssembly.nunit --trace:Debug",
+		//	TestConsoleVersions = new string[] { LATEST_SUPPORTED_CONSOLE_VERSION },
+		//	ExpectedResult = new ExpectedResult("Passed")
+		//	{
+		//		Total = 4,
+		//		Passed = 4,
+		//		Failed = 0,
+		//		Warnings = 0,
+		//		Inconclusive = 0,
+		//		Skipped = 0,
+		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
+		//	}
+		//},
+		//new PackageTest()
+		//{
+		//	Description = "Project with one assembly, some failures",
+		//	Arguments = "FailingAssembly.nunit",
+		//	TestConsoleVersions = new string[] { LATEST_SUPPORTED_CONSOLE_VERSION },
+		//	ExpectedResult = new ExpectedResult("Failed")
+		//	{
+		//		Total = 9,
+		//		Passed = 4,
+		//		Failed = 2,
+		//		Warnings = 0,
+		//		Inconclusive = 1,
+		//		Skipped = 2,
+		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
+		//	}
+		//},
+		//new PackageTest()
+		//{
+		//	Description = "Project with both assemblies",
+		//	Arguments = "BothAssemblies.nunit",
+		//	TestConsoleVersions = new string[] { LATEST_SUPPORTED_CONSOLE_VERSION },
+		//	ExpectedResult = new ExpectedResult("Failed")
+		//	{
+		//		Total = 13,
+		//		Passed = 8,
+		//		Failed = 2,
+		//		Warnings = 0,
+		//		Inconclusive = 1,
+		//		Skipped = 2,
+		//		Assemblies = new[] {
+		//			new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
+		//			new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
+		//		}
 			}
 		}
 	}

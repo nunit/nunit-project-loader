@@ -81,8 +81,9 @@ public class BuildParameters
 
 	public string ProjectDirectory { get; }
 	public string OutputDirectory => ProjectDirectory + "bin/" + Configuration + "/";
-	public string SourceDirectory => ProjectDirectory + "src";
+	public string SourceDirectory => ProjectDirectory + "src/";
 	public string PackageDirectory => ProjectDirectory + "output/";
+	public string PackageTestDirectory => PackageDirectory + "tests/";
 	public string ToolsDirectory => ProjectDirectory + "tools/";
 	public string NuGetInstallDirectory => ToolsDirectory + NUGET_ID + "/";
 	public string ChocolateyInstallDirectory => ToolsDirectory + CHOCO_ID + "/";
