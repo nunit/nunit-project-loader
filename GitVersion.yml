@@ -1,11 +1,11 @@
-next-version: 3.7.0
+next-version: 3.7.2
 mode: ContinuousDelivery
 legacy-semver-padding: 5
 build-metadata-padding: 5
 commits-since-version-source-padding: 5
 branches:
   master:
-    regex: ^main$
+    regex: ^(main|version3)$
     tag: dev
   release:
     tag: pre
