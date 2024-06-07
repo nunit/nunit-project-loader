@@ -155,7 +155,7 @@ Task("VerifyNuGetPackage")
 	{
 		Check.That(parameters.NuGetInstallDirectory,
 			HasFiles("CHANGES.md", "LICENSE.txt"),
-			HasDirectory("tools").WithFile("nunit-project-loader.dll"));
+			HasDirectory("tools").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"));
 		Information("Verification was successful!");
 	});
 
@@ -194,7 +194,7 @@ Task("VerifyChocolateyPackage")
 	{
 		Check.That(parameters.ChocolateyInstallDirectory,
 			HasDirectory("tools").WithFiles(
-				"CHANGES.md", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll"));
+				"CHANGES.md", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll", "nunit.engine.api.dll"));
 		Information("Verification was successful!");
 	});
 

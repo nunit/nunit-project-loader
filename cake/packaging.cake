@@ -31,6 +31,7 @@ public void BuildNuGetPackage(BuildParameters parameters)
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" });
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.md" });
 		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools" });
+		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit.engine.api.dll", Target = "tools" });
 
 	NuGetPack(
 		new NuGetPackSettings()
@@ -69,6 +70,7 @@ public void BuildChocolateyPackage(BuildParameters parameters)
     content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.md", Target = "tools" });
     content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" });
 	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools" });
+	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit.engine.api.dll", Target = "tools" });
 
     ChocolateyPack(
 		new ChocolateyPackSettings()
