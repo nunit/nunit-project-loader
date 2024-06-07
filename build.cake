@@ -23,7 +23,7 @@ const string DEFAULT_CONFIGURATION = "Release";
 // ARGUMENTS  
 //////////////////////////////////////////////////////////////////////
 
-var target = Argument("target", "Default");
+var target = Argument("target", Argument("t", "Default"));
 
 // Additional arguments defined in the cake scripts:
 //   --configuration
@@ -475,7 +475,7 @@ Task("PackageChocolatey")
 	.IsDependentOn("VerifyChocolateyPackage")
 	.IsDependentOn("TestChocolateyPackage");
 
-Task("Full")
+Task("BuildTestAndPackage")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
