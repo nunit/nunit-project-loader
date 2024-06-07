@@ -1,11 +1,11 @@
-version: 3.5.{build}
-image: Visual Studio 2017
+version: 4.0.{build}
+image: Visual Studio 2022
 
 build_script:
-  - ps: .\build.ps1 -Target "Appveyor"
+  - ps: .\build.ps1 --Target=Appveyor --Configuration=Release
 
 # disable built-in tests.
-test: off
+test: false
 
 artifacts:
 - path: output\*.nupkg

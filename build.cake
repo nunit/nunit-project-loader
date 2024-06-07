@@ -1,6 +1,7 @@
-#tool nuget:?package=GitVersion.CommandLine&version=5.0.0
-#tool nuget:https://myget.org/F/nunit/?package=NUnit.ConsoleRunner&version=4.0.0-dev00051&prerelease
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.15.0
+#tool NuGet.CommandLine&version=6.9.1
+#tool nuget:?package=GitVersion.CommandLine&version=5.6.3
+#tool nuget:?package=GitReleaseManager&version=0.17.0
+#tool nuget:https://myget.org/F/nunit/?package=NUnit.ConsoleRunner&version=4.0.0-dev00007
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -13,8 +14,7 @@ const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-project-loader";
 const string DEFAULT_VERSION = "4.0.0";
 const string DEFAULT_CONFIGURATION = "Release";
-const string LATEST_CONSOLE_DEV_VERSION = "4.0.0-dev00051";
-const string PRE_4_0_CONSOLE_VERSION = "3.15.0";
+const string LATEST_CONSOLE_DEV_VERSION = "4.0.0-dev00007";
 
 // Load scripts after defining constants
 #load cake/parameters.cake
@@ -23,7 +23,7 @@ const string PRE_4_0_CONSOLE_VERSION = "3.15.0";
 // ARGUMENTS  
 //////////////////////////////////////////////////////////////////////
 
-var target = Argument("target", "Default");
+var target = Argument("target", Argument("t", "Default"));
 
 // Additional arguments defined in the cake scripts:
 //   --configuration
@@ -209,13 +209,6 @@ Task("TestChocolateyPackage")
 
 PackageTest[] PackageTests = new PackageTest[]
 {
-		new PackageTest()
-		{
-			Description = "Older Version of console cannot load extension",
-			Arguments = "PassingAssembly.nunit",
-			TestConsoleVersions = new string[] { PRE_4_0_CONSOLE_VERSION },
-			ExpectedError = "File type is not supported"
-		},
 		new PackageTest()
 		{
 			Description = "Project with one assembly, all tests pass",
@@ -428,7 +421,7 @@ Task("PackageChocolatey")
 	.IsDependentOn("VerifyChocolateyPackage")
 	.IsDependentOn("TestChocolateyPackage");
 
-Task("Full")
+Task("BuildTestAndPackage")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")

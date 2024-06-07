@@ -117,7 +117,7 @@ public class BuildParameters
 
 	public string GetPathToConsoleRunner(string version)
 	{
-		return ToolsDirectory + "NUnit.ConsoleRunner." + version + "/tools/nunit3-console.exe";
+		return $"{ToolsDirectory}NUnit.ConsoleRunner.{version}/tools/nunit{version[0]}-console.exe";
 	}
 
 	private void Validate()
