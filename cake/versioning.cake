@@ -24,7 +24,7 @@ public class BuildVersion
 
 		// TODO: Get GitVersion to work on Linux
         string packageVersion = context.HasArgument("packageVersion")
-            ? context.Argument("packageVersion", DEFAULT_VERSION)
+            ? context.Argument<string>("packageVersion")
             : CalculatePackageVersion();
 
 		int dash = packageVersion.IndexOf('-');

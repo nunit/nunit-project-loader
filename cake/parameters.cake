@@ -116,11 +116,6 @@ public class BuildParameters
 	public bool IsProductionRelease =>
 		!IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel);
 
-	public string GetPathToConsoleRunner(string version)
-	{
-		return ToolsDirectory + "NUnit.ConsoleRunner." + version + "/tools/nunit3-console.exe";
-	}
-
 	private void Validate()
 	{
 		var validationErrors = new List<string>();

@@ -84,18 +84,24 @@ public abstract class PackageTester
 
 	private void RunConsoleTest(string consoleVersion, string arguments)
     {
-		string runner = _parameters.GetPathToConsoleRunner(consoleVersion);
+		string runnerDir = _parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{consoleVersion}/tools/";
+		if (consoleVersion.StartsWith("NetCore."))
+			runnerDir += "net6.0/";
+		string runner = runnerDir + "nunit3-console.exe";
+		bool isNetCoreRunner = consoleVersion.StartsWith("NetCore.");
 
 		if (InstallDirectory.EndsWith(CHOCO_ID + "/"))
 		{
 			// We are using nuget packages for the runner, so add an extra
 			// addins file to allow detecting chocolatey packages
-			string runnerDir = System.IO.Path.GetDirectoryName(runner);
 			using (var writer = new StreamWriter(runnerDir + "/choco.engine.addins"))
 				writer.WriteLine("../../nunit-extension-*/tools/");
 		}
 
-		_context.StartProcess(runner, arguments);
+		if (isNetCoreRunner)
+			_context.StartProcess("dotnet", $"\"{runner}\" {arguments}");
+		else
+			_context.StartProcess(runner, arguments);
 		// We don't check the error code because we know that
 		// mock-assembly returns -4 due to a bad fixture.
 

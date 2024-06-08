@@ -3,6 +3,8 @@
 #tool nuget:?package=GitReleaseManager&version=0.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&Version=3.17.0
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&Version=3.15.5
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -13,8 +15,8 @@ const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
 const string CHOCO_ID = "nunit-extension-nunit-project-loader";
 const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-project-loader";
-const string DEFAULT_VERSION = "3.7.1";
 const string DEFAULT_CONFIGURATION = "Release";
+const string CONSOLE_VERSION_FOR_UNIT_TESTS = "3.17.0";
 
 // Load scripts after defining constants
 #load cake/parameters.cake
@@ -121,7 +123,8 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does<BuildParameters>((parameters) =>
 	{
-		NUnit3(parameters.OutputDirectory + "net20/nunit-project-loader.tests.dll");
+		string runner = parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{CONSOLE_VERSION_FOR_UNIT_TESTS}/tools/nunit3-console.exe";
+		StartProcess(runner, parameters.OutputDirectory + "net20/nunit-project-loader.tests.dll");
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -211,7 +214,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with one assembly, all tests pass",
 		Arguments = "PassingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.17.0", "3.15.5" },
+		TestConsoleVersions = new string[] { "3.17.0", "3.15.5", "NetCore.3.17.0", "NetCore.3.15.5" },
 		ExpectedResult = new ExpectedResult("Passed")
 		{
 			Total = 4,
@@ -227,7 +230,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with one assembly, some failures",
 		Arguments = "FailingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.17.0", "3.15.5" },
+		TestConsoleVersions = new string[] { "3.17.0", "3.15.5", "NetCore.3.17.0", "NetCore.3.15.5" },
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 			Total = 9,
@@ -243,7 +246,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with both assemblies",
 		Arguments = "BothAssemblies.nunit",
-		TestConsoleVersions = new string[] { "3.17.0", "3.15.5" },
+		TestConsoleVersions = new string[] { "3.17.0", "3.15.5", "NetCore.3.17.0", "NetCore.3.15.5" },
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 			Total = 13,
@@ -255,62 +258,6 @@ PackageTest[] PackageTests = new PackageTest[]
 			Assemblies = new[] {
 				new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
 				new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
-		////new PackageTest()
-		////{
-		////	Description = "Older Version of console cannot load extension",
-		////	Arguments = "PassingAssembly.nunit",
-		////	TestConsoleVersions = new string[] { PRE_4_0_CONSOLE_VERSION },
-		////	ExpectedError = "File type is not supported"
-		////},
-		//new PackageTest()
-		//{
-		//	Description = "Project with one assembly, all tests pass",
-		//	Arguments = "PassingAssembly.nunit --trace:Debug",
-		//	TestConsoleVersions = new string[] { LATEST_SUPPORTED_CONSOLE_VERSION },
-		//	ExpectedResult = new ExpectedResult("Passed")
-		//	{
-		//		Total = 4,
-		//		Passed = 4,
-		//		Failed = 0,
-		//		Warnings = 0,
-		//		Inconclusive = 0,
-		//		Skipped = 0,
-		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
-		//	}
-		//},
-		//new PackageTest()
-		//{
-		//	Description = "Project with one assembly, some failures",
-		//	Arguments = "FailingAssembly.nunit",
-		//	TestConsoleVersions = new string[] { LATEST_SUPPORTED_CONSOLE_VERSION },
-		//	ExpectedResult = new ExpectedResult("Failed")
-		//	{
-		//		Total = 9,
-		//		Passed = 4,
-		//		Failed = 2,
-		//		Warnings = 0,
-		//		Inconclusive = 1,
-		//		Skipped = 2,
-		//		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
-		//	}
-		//},
-		//new PackageTest()
-		//{
-		//	Description = "Project with both assemblies",
-		//	Arguments = "BothAssemblies.nunit",
-		//	TestConsoleVersions = new string[] { LATEST_SUPPORTED_CONSOLE_VERSION },
-		//	ExpectedResult = new ExpectedResult("Failed")
-		//	{
-		//		Total = 13,
-		//		Passed = 8,
-		//		Failed = 2,
-		//		Warnings = 0,
-		//		Inconclusive = 1,
-		//		Skipped = 2,
-		//		Assemblies = new[] {
-		//			new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
-		//			new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
-		//		}
 			}
 		}
 	}
