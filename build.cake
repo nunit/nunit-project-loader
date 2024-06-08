@@ -3,8 +3,6 @@
 #tool nuget:?package=GitReleaseManager&version=0.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
-#tool nuget:?package=NUnit.ConsoleRunner.NetCore&Version=3.17.0
-#tool nuget:?package=NUnit.ConsoleRunner.NetCore&Version=3.15.5
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -16,6 +14,7 @@ const string CHOCO_ID = "nunit-extension-nunit-project-loader";
 const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-project-loader";
 const string DEFAULT_CONFIGURATION = "Release";
+static readonly string[] CONSOLE_VERSIONS_FOR_PACKAGE_TESTS = new string[] { "3.17.0", "3.15.5" };
 const string CONSOLE_VERSION_FOR_UNIT_TESTS = "3.17.0";
 
 // Load scripts after defining constants
@@ -214,7 +213,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with one assembly, all tests pass",
 		Arguments = "PassingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.17.0", "3.15.5", "NetCore.3.17.0", "NetCore.3.15.5" },
+		TestConsoleVersions =  CONSOLE_VERSIONS_FOR_PACKAGE_TESTS,
 		ExpectedResult = new ExpectedResult("Passed")
 		{
 			Total = 4,
@@ -230,7 +229,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with one assembly, some failures",
 		Arguments = "FailingAssembly.nunit",
-		TestConsoleVersions = new string[] { "3.17.0", "3.15.5", "NetCore.3.17.0", "NetCore.3.15.5" },
+		TestConsoleVersions =  CONSOLE_VERSIONS_FOR_PACKAGE_TESTS,
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 			Total = 9,
@@ -246,7 +245,7 @@ PackageTest[] PackageTests = new PackageTest[]
 	{
 		Description = "Project with both assemblies",
 		Arguments = "BothAssemblies.nunit",
-		TestConsoleVersions = new string[] { "3.17.0", "3.15.5", "NetCore.3.17.0", "NetCore.3.15.5" },
+		TestConsoleVersions =  CONSOLE_VERSIONS_FOR_PACKAGE_TESTS,
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 			Total = 13,

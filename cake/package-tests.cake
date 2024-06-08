@@ -39,7 +39,7 @@ public abstract class PackageTester
 
 		foreach (var packageTest in packageTests)
 		{
-			var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
+			var resultFile = _parameters.ProjectDirectory + DEFAULT_TEST_RESULT_FILE;
 
 			foreach (var consoleVersion in packageTest.TestConsoleVersions)
 			{
@@ -85,8 +85,8 @@ public abstract class PackageTester
 	private void RunConsoleTest(string consoleVersion, string arguments)
     {
 		string runnerDir = _parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{consoleVersion}/tools/";
-		if (consoleVersion.StartsWith("NetCore."))
-			runnerDir += "net6.0/";
+		//if (consoleVersion.StartsWith("NetCore."))
+		//	runnerDir += "net6.0/any/";
 		string runner = runnerDir + "nunit3-console.exe";
 		bool isNetCoreRunner = consoleVersion.StartsWith("NetCore.");
 
@@ -98,9 +98,9 @@ public abstract class PackageTester
 				writer.WriteLine("../../nunit-extension-*/tools/");
 		}
 
-		if (isNetCoreRunner)
-			_context.StartProcess("dotnet", $"\"{runner}\" {arguments}");
-		else
+		//if (isNetCoreRunner)
+		//	_context.StartProcess("dotnet", $"\"{runner}\" {arguments}");
+		//else
 			_context.StartProcess(runner, arguments);
 		// We don't check the error code because we know that
 		// mock-assembly returns -4 due to a bad fixture.
