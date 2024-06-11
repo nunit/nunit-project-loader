@@ -3,6 +3,8 @@
 #tool nuget:?package=GitReleaseManager&version=0.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.18.0-dev00037
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
 
 ////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -14,7 +16,9 @@ const string CHOCO_ID = "nunit-extension-nunit-project-loader";
 const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-project-loader";
 const string DEFAULT_CONFIGURATION = "Release";
-static readonly string[] CONSOLE_VERSIONS_FOR_PACKAGE_TESTS = new string[] { "3.17.0", "3.15.5" };
+// Make sure that all the following console versions are installed using #tool
+// For the net core runner, prefix version here with "NetCore" e.g.: "NetCore.3.7.1"
+static readonly string[] CONSOLE_VERSIONS_FOR_PACKAGE_TESTS = new string[] { "3.17.0", "3.15.5", "3.18.0-dev00037" };
 const string CONSOLE_VERSION_FOR_UNIT_TESTS = "3.17.0";
 
 // Load scripts after defining constants
@@ -91,6 +95,7 @@ Task("NuGetRestore")
 //////////////////////////////////////////////////////////////////////
 
 Task("Build")
+	.IsDependentOn("Clean")
     .IsDependentOn("NuGetRestore")
     .Does<BuildParameters>((parameters) =>
     {
@@ -120,10 +125,22 @@ Task("Build")
 
 Task("Test")
 	.IsDependentOn("Build")
+	.IsDependentOn("TestNet462")
+	.IsDependentOn("TestNet60");
+
+Task("TestNet462")
 	.Does<BuildParameters>((parameters) =>
 	{
 		string runner = parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{CONSOLE_VERSION_FOR_UNIT_TESTS}/tools/nunit3-console.exe";
-		StartProcess(runner, parameters.OutputDirectory + "net20/nunit-project-loader.tests.dll");
+		StartProcess(runner, parameters.OutputDirectory + "net462/nunit-project-loader.tests.dll");
+	});
+
+Task("TestNet60")
+	.Does<BuildParameters>((parameters) =>
+	{
+		// Need to use dev build for this test
+		string runner = parameters.ToolsDirectory + $"NUnit.ConsoleRunner.3.18.0-dev00037/tools/nunit3-console.exe";
+		StartProcess(runner, parameters.OutputDirectory + "net6.0/nunit-project-loader.tests.dll");
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -157,7 +174,7 @@ Task("VerifyNuGetPackage")
 	{
 		Check.That(parameters.NuGetInstallDirectory,
 			HasFiles("CHANGES.md", "LICENSE.txt"),
-			HasDirectory("tools").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"));
+			HasDirectory("tools/net20").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"));
 		Information("Verification was successful!");
 	});
 
@@ -196,7 +213,9 @@ Task("VerifyChocolateyPackage")
 	{
 		Check.That(parameters.ChocolateyInstallDirectory,
 			HasDirectory("tools").WithFiles(
-				"CHANGES.md", "LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.dll", "nunit.engine.api.dll"));
+				"CHANGES.md", "LICENSE.txt", "VERIFICATION.txt"),
+			HasDirectory("tools/net20").WithFiles(
+				"nunit-project-loader.dll", "nunit.engine.api.dll"));
 		Information("Verification was successful!");
 	});
 
@@ -246,6 +265,57 @@ PackageTest[] PackageTests = new PackageTest[]
 		Description = "Project with both assemblies",
 		Arguments = "BothAssemblies.nunit",
 		TestConsoleVersions =  CONSOLE_VERSIONS_FOR_PACKAGE_TESTS,
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Total = 13,
+			Passed = 8,
+			Failed = 2,
+			Warnings = 0,
+			Inconclusive = 1,
+			Skipped = 2,
+			Assemblies = new[] {
+				new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0"),
+				new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0")
+			}
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Project with one assembly, all tests pass",
+		Arguments = "PassingAssemblyNetCore.nunit",
+		TestConsoleVersions =  new string[] { "NetCore.3.18.0-dev00037" },
+		ExpectedResult = new ExpectedResult("Passed")
+		{
+			Total = 4,
+			Passed = 4,
+			Failed = 0,
+			Warnings = 0,
+			Inconclusive = 0,
+			Skipped = 0,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-2.0") }
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Project with one assembly, some failures",
+		Arguments = "FailingAssemblyNetCore.nunit",
+		TestConsoleVersions =  new string[] { "NetCore.3.18.0-dev00037" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Total = 9,
+			Passed = 4,
+			Failed = 2,
+			Warnings = 0,
+			Inconclusive = 1,
+			Skipped = 2,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Project with both assemblies",
+		Arguments = "BothAssembliesNetCore.nunit",
+		TestConsoleVersions =  new string[] { "NetCore.3.18.0-dev00037" },
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 			Total = 13,

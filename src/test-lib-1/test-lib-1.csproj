@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- If adding/updating TargetFrameworks, also update build.cake -->
-    <TargetFramework>net20</TargetFramework>
+    <TargetFrameworks>net20;net6.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <OutputType>Library</OutputType>
     <RootNamespace>TestLib1</RootNamespace>
