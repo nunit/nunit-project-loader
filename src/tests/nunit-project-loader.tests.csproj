@@ -1,30 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- If adding/updating TargetFrameworks, also update build.cake -->
-    <!-- Even though we don't support running tests build for netcoreapp2.1 yet, we still build for it -->
-    <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
-    <Configurations>Debug;Release</Configurations>
-    <RootNamespace>NUnit.Engine.Tests</RootNamespace>
-    <AssemblyName>nunit-project-loader.tests</AssemblyName>
-
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="nunit.engine.api" Version="3.11.1" />
-    <!-- This is the newest NUnit that support .NET Framework 2.0 -->
-    <PackageReference Include="NUnit" Version="3.11.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\extension\nunit-project-loader.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="resources\NUnitProject.nunit" />
-    <EmbeddedResource Include="resources\NUnitProject_ComplexSettings.nunit" />
-    <EmbeddedResource Include="resources\NUnitProject_EmptyConfigs.nunit" />
-    <EmbeddedResource Include="resources\NUnitProject_EmptyProject.nunit" />
-    <EmbeddedResource Include="resources\NUnitProject_ManualBinPath.nunit" />
-    <EmbeddedResource Include="resources\NUnitProject_XmlDecl.nunit" />
-  </ItemGroup>
+    
+	<PropertyGroup>
+        <!-- If adding/updating TargetFrameworks, also update build.cake -->
+        <!-- Even though we don't support running tests build for netcoreapp2.1 yet, we still build for it -->
+        <TargetFrameworks>net462;net6.0</TargetFrameworks>
+        <Configurations>Debug;Release</Configurations>
+        <RootNamespace>NUnit.Engine.Tests</RootNamespace>
+        <AssemblyName>nunit-project-loader.tests</AssemblyName>
+        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="nunit.engine.api" Version="3.11.1" />
+		<PackageReference Include="NUnit" Version="3.14.0" />
+	</ItemGroup>
+  
+	<ItemGroup>
+        <ProjectReference Include="..\extension\nunit-project-loader.csproj" />
+    </ItemGroup>
+  
+	<ItemGroup>
+        <EmbeddedResource Include="resources\NUnitProject.nunit" />
+        <EmbeddedResource Include="resources\NUnitProject_ComplexSettings.nunit" />
+        <EmbeddedResource Include="resources\NUnitProject_EmptyConfigs.nunit" />
+        <EmbeddedResource Include="resources\NUnitProject_EmptyProject.nunit" />
+        <EmbeddedResource Include="resources\NUnitProject_ManualBinPath.nunit" />
+        <EmbeddedResource Include="resources\NUnitProject_XmlDecl.nunit" />
+    </ItemGroup>
+	
 </Project>

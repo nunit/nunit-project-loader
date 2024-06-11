@@ -84,22 +84,28 @@ public abstract class PackageTester
 
 	private void RunConsoleTest(string consoleVersion, string arguments)
     {
-		string runnerDir = _parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{consoleVersion}/tools/";
-		//if (consoleVersion.StartsWith("NetCore."))
-		//	runnerDir += "net6.0/any/";
-		string runner = runnerDir + "nunit3-console.exe";
 		bool isNetCoreRunner = consoleVersion.StartsWith("NetCore.");
+
+		string runnerDir = _parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{consoleVersion}/tools/";
+		if (isNetCoreRunner) runnerDir += "net6.0/";
+
+		var runner = runnerDir + "nunit3-console.exe";
 
 		if (InstallDirectory.EndsWith(CHOCO_ID + "/"))
 		{
-			// We are using nuget packages for the runner, so add an extra
-			// addins file to allow detecting chocolatey packages
+			// We are using nuget packages for the runner, so it won't normally recognize
+			// chocolatey packages. We add an extra addins file for that purpose.
 			using (var writer = new StreamWriter(runnerDir + "/choco.engine.addins"))
+			{
 				writer.WriteLine("../../nunit-extension-*/tools/");
+				writer.WriteLine("../../nunit-extension-*/tools/*/");
+				writer.WriteLine("../../../nunit-extension-*/tools/");
+				writer.WriteLine("../../../nunit-extension-*/tools/*/");
+			}
 		}
-
+		
 		//if (isNetCoreRunner)
-		//	_context.StartProcess("dotnet", $"\"{runner}\" {arguments}");
+		//	_context.StartProcess("dotnet", $"\"{runnerDir}nunit3-console.exe\" {arguments}");
 		//else
 			_context.StartProcess(runner, arguments);
 		// We don't check the error code because we know that
