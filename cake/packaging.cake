@@ -30,6 +30,7 @@ public void BuildNuGetPackage(BuildParameters parameters)
 		var content = new List<NuSpecContent>();
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" });
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.md" });
+		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "nunit_256.png" });
 		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "nunit-project-loader.addins", Target = "tools" });
 		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools/net20" });
 		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit.engine.api.dll", Target = "tools/net20" });
@@ -47,15 +48,12 @@ public void BuildNuGetPackage(BuildParameters parameters)
 			Description = DESCRIPTION,
 			Summary = SUMMARY,
 			ProjectUrl = PROJECT_URL,
-			IconUrl = ICON_URL,
-			//Icon = "nunit.ico", // Waiting for Cake release
+			Icon = "nunit_256.png",
 			License = new NuSpecLicense() { Type = "expression", Value = "MIT" },
-			//LicenseUrl = LICENSE_URL,
 			RequireLicenseAcceptance = false,
 			Copyright = COPYRIGHT,
 			ReleaseNotes = RELEASE_NOTES,
 			Tags = TAGS,
-			//Language = "en-US",
 			OutputDirectory = parameters.PackageDirectory,
 			KeepTemporaryNuSpecFile = false,
 			Files = content
