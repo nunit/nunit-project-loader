@@ -6,22 +6,7 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.18.0-dev00037
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
 
-////////////////////////////////////////////////////////////////////
-// CONSTANTS
-//////////////////////////////////////////////////////////////////////
-
-const string SOLUTION_FILE = "nunit-project-loader.sln";
-const string NUGET_ID = "NUnit.Extension.NUnitProjectLoader";
-const string CHOCO_ID = "nunit-extension-nunit-project-loader";
-const string GITHUB_OWNER = "nunit";
-const string GITHUB_REPO = "nunit-project-loader";
-const string DEFAULT_CONFIGURATION = "Release";
-// Make sure that all the following console versions are installed using #tool
-// For the net core runner, prefix version here with "NetCore" e.g.: "NetCore.3.7.1"
-static readonly string[] CONSOLE_VERSIONS_FOR_PACKAGE_TESTS = new string[] { "3.17.0", "3.15.5", "3.18.0-dev00037" };
-const string CONSOLE_VERSION_FOR_UNIT_TESTS = "3.17.0";
-
-// Load scripts after defining constants
+// Load scripts 
 #load cake/parameters.cake
 
 //////////////////////////////////////////////////////////////////////
@@ -71,6 +56,8 @@ Task("Clean")
 		CleanDirectory(parameters.OutputDirectory);
 		Information("Cleaning " + parameters.PackageDirectory);
 		CleanDirectory(parameters.PackageDirectory);
+		Information("Deleting log files");
+		DeleteFiles(parameters.ProjectDirectory + "*.log");
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -133,6 +120,8 @@ Task("TestNet462")
 	{
 		string runner = parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{CONSOLE_VERSION_FOR_UNIT_TESTS}/tools/nunit3-console.exe";
 		StartProcess(runner, parameters.OutputDirectory + "net462/nunit-project-loader.tests.dll");
+		// We will have empty logs so long as we test against 3.15.5 and 3.17.0
+		DeleteEmptyLogFiles(parameters.ProjectDirectory);
 	});
 
 Task("TestNet60")
@@ -173,7 +162,7 @@ Task("VerifyNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		Check.That(parameters.NuGetInstallDirectory,
-			HasFiles("CHANGES.md", "LICENSE.txt"),
+			HasFiles("CHANGES.md", "LICENSE.txt", "nunit_256.png"),
 			HasDirectory("tools/net20").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"));
 		Information("Verification was successful!");
 	});
@@ -183,6 +172,9 @@ Task("TestNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		new NuGetPackageTester(parameters).RunPackageTests(PackageTests);
+
+		// We will have empty logs so long as we test against 3.15.5 and 3.17.0
+		DeleteEmptyLogFiles(parameters.ProjectDirectory);
 	});
 
 Task("BuildChocolateyPackage")
@@ -224,6 +216,9 @@ Task("TestChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		new ChocolateyPackageTester(parameters).RunPackageTests(PackageTests);
+
+		// We will have empty logs so long as we test against 3.15.5 and 3.17.0
+		DeleteEmptyLogFiles(parameters.ProjectDirectory);
 	});
 
 PackageTest[] PackageTests = new PackageTest[]
