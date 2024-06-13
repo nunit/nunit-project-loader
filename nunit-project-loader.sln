@@ -27,8 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-AB9D-497E-8FC3-B541A9A24EEC}"
 	ProjectSection(SolutionItems) = preProject
-		cake\constants.cake = cake\constants.cake
 		cake\build-settings.cake = cake\build-settings.cake
+		cake\constants.cake = cake\constants.cake
 		cake\local-targets.cake = cake\local-targets.cake
 		cake\package-checks.cake = cake\package-checks.cake
 		cake\package-tests.cake = cake\package-tests.cake
@@ -42,6 +42,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-1", "src\test-lib-1\test-lib-1.csproj", "{1FA6F840-F225-4597-80AE-2C78B466D9C6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-2", "src\test-lib-2\test-lib-2.csproj", "{7808DEA9-FB13-47FC-823F-DC78C1057061}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{C6F53510-E7B7-4CBF-85C6-E6897E424271}"
+	ProjectSection(SolutionItems) = preProject
+		cake\common\dotnet.cake = cake\common\dotnet.cake
+		cake\common\common-constants.cake = cake\common\common-constants.cake
+		cake\common\tasks.cake = cake\common\tasks.cake
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +78,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1E689680-AB9D-497E-8FC3-B541A9A24EEC} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{C6F53510-E7B7-4CBF-85C6-E6897E424271} = {1E689680-AB9D-497E-8FC3-B541A9A24EEC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B07C6102-6B2F-4FC3-9F17-FCD093128F6D}

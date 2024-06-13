@@ -7,7 +7,8 @@
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
 
 // Load scripts 
-#load cake/build-settings.cake
+#load cake/common/*.cake
+#load cake/*.cake
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS  

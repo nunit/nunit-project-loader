@@ -1,14 +1,4 @@
-﻿#load "./constants.cake"
-#load "./versioning.cake"
-#load "./packaging.cake"
-#load "./package-checks.cake"
-#load "./package-tests.cake"
-#load "./test-results.cake"
-#load "./test-reports.cake"
-#load "./utilities.cake"
-#load "./local-targets.cake"
-
-using System;
+﻿using System;
 
 public class BuildSettings
 {
