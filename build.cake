@@ -7,7 +7,7 @@
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
 
 // Load scripts 
-#load cake/parameters.cake
+#load cake/build-settings.cake
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS  
@@ -23,16 +23,16 @@ var target = Argument("target", Argument("t", "Default"));
 // SETUP AND TEARDOWN
 //////////////////////////////////////////////////////////////////////
 
-Setup<BuildParameters>((context) =>
+Setup<BuildSettings>((context) =>
 {
-	var parameters = BuildParameters.Create(context);
+	var settings = BuildSettings.Create(context);
 
 	if (BuildSystem.IsRunningOnAppVeyor)
-		AppVeyor.UpdateBuildVersion(parameters.PackageVersion + "-" + AppVeyor.Environment.Build.Number);
+		AppVeyor.UpdateBuildVersion(settings.PackageVersion + "-" + AppVeyor.Environment.Build.Number);
 
-	Information("Building {0} version {1} of NUnit Project Loader.", parameters.Configuration, parameters.PackageVersion);
+	Information("Building {0} version {1} of NUnit Project Loader.", settings.Configuration, settings.PackageVersion);
 
-	return parameters;
+	return settings;
 });
 
 //////////////////////////////////////////////////////////////////////
@@ -40,9 +40,9 @@ Setup<BuildParameters>((context) =>
 //////////////////////////////////////////////////////////////////////
 
 Task("DumpSettings")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		parameters.DumpSettings();
+		settings.DumpSettings();
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -50,14 +50,14 @@ Task("DumpSettings")
 //////////////////////////////////////////////////////////////////////
 
 Task("Clean")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		Information("Cleaning " + parameters.OutputDirectory);
-		CleanDirectory(parameters.OutputDirectory);
-		Information("Cleaning " + parameters.PackageDirectory);
-		CleanDirectory(parameters.PackageDirectory);
+		Information("Cleaning " + settings.OutputDirectory);
+		CleanDirectory(settings.OutputDirectory);
+		Information("Cleaning " + settings.PackageDirectory);
+		CleanDirectory(settings.PackageDirectory);
 		Information("Deleting log files");
-		DeleteFiles(parameters.ProjectDirectory + "*.log");
+		DeleteFiles(settings.ProjectDirectory + "*.log");
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -84,12 +84,12 @@ Task("NuGetRestore")
 Task("Build")
 	.IsDependentOn("Clean")
     .IsDependentOn("NuGetRestore")
-    .Does<BuildParameters>((parameters) =>
+    .Does<BuildSettings>((settings) =>
     {
 		if(IsRunningOnWindows())
 		{
 			MSBuild(SOLUTION_FILE, new MSBuildSettings()
-				.SetConfiguration(parameters.Configuration)
+				.SetConfiguration(settings.Configuration)
 				.SetMSBuildPlatform(MSBuildPlatform.Automatic)
 				.SetVerbosity(Verbosity.Minimal)
 				.SetNodeReuse(false)
@@ -100,7 +100,7 @@ Task("Build")
 		{
 			XBuild(SOLUTION_FILE, new XBuildSettings()
 				.WithTarget("Build")
-				.WithProperty("Configuration", parameters.Configuration)
+				.WithProperty("Configuration", settings.Configuration)
 				.SetVerbosity(Verbosity.Minimal)
 			);
 		}
@@ -116,20 +116,20 @@ Task("Test")
 	.IsDependentOn("TestNet60");
 
 Task("TestNet462")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		string runner = parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{CONSOLE_VERSION_FOR_UNIT_TESTS}/tools/nunit3-console.exe";
-		StartProcess(runner, parameters.OutputDirectory + "net462/nunit-project-loader.tests.dll");
+		string runner = settings.ToolsDirectory + $"NUnit.ConsoleRunner.{CONSOLE_VERSION_FOR_UNIT_TESTS}/tools/nunit3-console.exe";
+		StartProcess(runner, settings.OutputDirectory + "net462/nunit-project-loader.tests.dll");
 		// We will have empty logs so long as we test against 3.15.5 and 3.17.0
-		DeleteEmptyLogFiles(parameters.ProjectDirectory);
+		DeleteEmptyLogFiles(settings.ProjectDirectory);
 	});
 
 Task("TestNet60")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
 		// Need to use dev build for this test
-		string runner = parameters.ToolsDirectory + $"NUnit.ConsoleRunner.3.18.0-dev00037/tools/nunit3-console.exe";
-		StartProcess(runner, parameters.OutputDirectory + "net6.0/nunit-project-loader.tests.dll");
+		string runner = settings.ToolsDirectory + $"NUnit.ConsoleRunner.3.18.0-dev00037/tools/nunit3-console.exe";
+		StartProcess(runner, settings.OutputDirectory + "net6.0/nunit-project-loader.tests.dll");
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -137,31 +137,31 @@ Task("TestNet60")
 //////////////////////////////////////////////////////////////////////
 
 Task("BuildNuGetPackage")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		CreateDirectory(parameters.PackageDirectory);
+		CreateDirectory(settings.PackageDirectory);
 
-		BuildNuGetPackage(parameters);
+		BuildNuGetPackage(settings);
 	});
 
 Task("InstallNuGetPackage")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
 		// Ensure we aren't inadvertently using the chocolatey install
-		if (DirectoryExists(parameters.ChocolateyInstallDirectory))
-			DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+		if (DirectoryExists(settings.ChocolateyInstallDirectory))
+			DeleteDirectory(settings.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
-		CleanDirectory(parameters.NuGetInstallDirectory);
-		Unzip(parameters.NuGetPackage, parameters.NuGetInstallDirectory);
+		CleanDirectory(settings.NuGetInstallDirectory);
+		Unzip(settings.NuGetPackage, settings.NuGetInstallDirectory);
 
-		Information($"Unzipped {parameters.NuGetPackageName} to { parameters.NuGetInstallDirectory}");
+		Information($"Unzipped {settings.NuGetPackageName} to { settings.NuGetInstallDirectory}");
 	});
 
 Task("VerifyNuGetPackage")
 	.IsDependentOn("InstallNuGetPackage")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		Check.That(parameters.NuGetInstallDirectory,
+		Check.That(settings.NuGetInstallDirectory,
 			HasFiles("LICENSE.txt", "nunit_256.png"),
 			HasDirectory("tools/net20").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"));
 		Information("Verification was successful!");
@@ -169,41 +169,41 @@ Task("VerifyNuGetPackage")
 
 Task("TestNuGetPackage")
 	.IsDependentOn("InstallNuGetPackage")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		new NuGetPackageTester(parameters).RunPackageTests(PackageTests);
+		new NuGetPackageTester(settings).RunPackageTests(PackageTests);
 
 		// We will have empty logs so long as we test against 3.15.5 and 3.17.0
-		DeleteEmptyLogFiles(parameters.ProjectDirectory);
+		DeleteEmptyLogFiles(settings.ProjectDirectory);
 	});
 
 Task("BuildChocolateyPackage")
 	.IsDependentOn("Build")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		CreateDirectory(parameters.PackageDirectory);
+		CreateDirectory(settings.PackageDirectory);
 
-		BuildChocolateyPackage(parameters);
+		BuildChocolateyPackage(settings);
 	});
 
 Task("InstallChocolateyPackage")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
 		// Ensure we aren't inadvertently using the nuget install
-		if (DirectoryExists(parameters.NuGetInstallDirectory))
-			DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+		if (DirectoryExists(settings.NuGetInstallDirectory))
+			DeleteDirectory(settings.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
-		CleanDirectory(parameters.ChocolateyInstallDirectory);
-		Unzip(parameters.ChocolateyPackage, parameters.ChocolateyInstallDirectory);
+		CleanDirectory(settings.ChocolateyInstallDirectory);
+		Unzip(settings.ChocolateyPackage, settings.ChocolateyInstallDirectory);
 
-		Information($"Unzipped {parameters.ChocolateyPackageName} to { parameters.ChocolateyInstallDirectory}");
+		Information($"Unzipped {settings.ChocolateyPackageName} to { settings.ChocolateyInstallDirectory}");
 	});
 
 Task("VerifyChocolateyPackage")
 	.IsDependentOn("InstallChocolateyPackage")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		Check.That(parameters.ChocolateyInstallDirectory,
+		Check.That(settings.ChocolateyInstallDirectory,
 			HasDirectory("tools").WithFiles(
 				"LICENSE.txt", "VERIFICATION.txt"),
 			HasDirectory("tools/net20").WithFiles(
@@ -213,12 +213,12 @@ Task("VerifyChocolateyPackage")
 
 Task("TestChocolateyPackage")
 	.IsDependentOn("InstallChocolateyPackage")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		new ChocolateyPackageTester(parameters).RunPackageTests(PackageTests);
+		new ChocolateyPackageTester(settings).RunPackageTests(PackageTests);
 
 		// We will have empty logs so long as we test against 3.15.5 and 3.17.0
-		DeleteEmptyLogFiles(parameters.ProjectDirectory);
+		DeleteEmptyLogFiles(settings.ProjectDirectory);
 	});
 
 PackageTest[] PackageTests = new PackageTest[]
@@ -348,15 +348,15 @@ Task("PublishPackages")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToMyGet")
 	.Description("Publish packages to MyGet")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		if (!parameters.ShouldPublishToMyGet)
+		if (!settings.ShouldPublishToMyGet)
 			Information("Nothing to publish to MyGet from this run.");
 		else
 			try
 			{
-				PushNuGetPackage(parameters.NuGetPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
-				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
+				PushNuGetPackage(settings.NuGetPackage, settings.MyGetApiKey, settings.MyGetPushUrl);
+				PushChocolateyPackage(settings.ChocolateyPackage, settings.MyGetApiKey, settings.MyGetPushUrl);
 			}
 			catch (Exception)
 			{
@@ -368,14 +368,14 @@ Task("PublishToMyGet")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToNuGet")
 	.Description("Publish packages to NuGet")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		if (!parameters.ShouldPublishToNuGet)
+		if (!settings.ShouldPublishToNuGet)
 			Information("Nothing to publish to NuGet from this run.");
 		else
 			try
 			{
-				PushNuGetPackage(parameters.NuGetPackage, parameters.NuGetApiKey, parameters.NuGetPushUrl);
+				PushNuGetPackage(settings.NuGetPackage, settings.NuGetApiKey, settings.NuGetPushUrl);
 			}
 			catch (Exception)
 			{
@@ -387,14 +387,14 @@ Task("PublishToNuGet")
 // which depends on it, or directly when recovering from errors.
 Task("PublishToChocolatey")
 	.Description("Publish packages to Chocolatey")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		if (!parameters.ShouldPublishToChocolatey)
+		if (!settings.ShouldPublishToChocolatey)
 			Information("Nothing to publish to Chocolatey from this run.");
 		else
 			try
 			{
-				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.ChocolateyApiKey, parameters.ChocolateyPushUrl);
+				PushChocolateyPackage(settings.ChocolateyPackage, settings.ChocolateyApiKey, settings.ChocolateyPushUrl);
 			}
 			catch (Exception)
 			{
@@ -407,23 +407,23 @@ Task("PublishToChocolatey")
 //////////////////////////////////////////////////////////////////////
 
 Task("CreateDraftRelease")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		if (parameters.IsReleaseBranch)
+		if (settings.IsReleaseBranch)
 		{
 			// NOTE: Since this is a release branch, the pre-release label
 			// is "pre", which we don't want to use for the draft release.
 			// The branch name contains the full information to be used
 			// for both the name of the draft release and the milestone,
 			// i.e. release-2.0.0, release-2.0.0-beta2, etc.
-			string milestone = parameters.BranchName.Substring(8);
+			string milestone = settings.BranchName.Substring(8);
 			string releaseName = $"NUnit Project Loader Extension {milestone}";
 
 			Information($"Creating draft release...");
 
 			try
 			{
-				GitReleaseManagerCreate(parameters.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
+				GitReleaseManagerCreate(settings.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
 				{
 					Name = releaseName,
 					Milestone = milestone
@@ -448,13 +448,13 @@ Task("CreateDraftRelease")
 //////////////////////////////////////////////////////////////////////
 
 Task("CreateProductionRelease")
-	.Does<BuildParameters>((parameters) =>
+	.Does<BuildSettings>((settings) =>
 	{
-		if (parameters.IsProductionRelease)
+		if (settings.IsProductionRelease)
 		{
-			string token = parameters.GitHubAccessToken;
-			string tagName = parameters.PackageVersion;
-			string assets = $"\"{parameters.NuGetPackage},{parameters.ChocolateyPackage}\"";
+			string token = settings.GitHubAccessToken;
+			string tagName = settings.PackageVersion;
+			string assets = $"\"{settings.NuGetPackage},{settings.ChocolateyPackage}\"";
 
 			Information($"Publishing release {tagName} to GitHub");
 

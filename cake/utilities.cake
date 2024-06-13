@@ -5,9 +5,9 @@
 // These stand-alone utility methods are only visible from within the
 // code for defined Tasks.
 
-public void DeleteObjectDirectories(BuildParameters parameters)
+public void DeleteObjectDirectories(BuildSettings settings)
 {
-    string pattern = parameters.SourceDirectory + "**/obj/";
+    string pattern = settings.SourceDirectory + "**/obj/";
 
     foreach (var dir in GetDirectories(pattern))
         DeleteDirectory(dir, new DeleteDirectorySettings() { Recursive = true });

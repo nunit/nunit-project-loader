@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 public class BuildVersion
 {
     private ISetupContext _context;
-    private BuildParameters _parameters;
+    private BuildSettings _settings;
     private GitVersion _gitVersion;
 
     // NOTE: This is complicated because (1) the user may have specified 
@@ -13,10 +13,10 @@ public class BuildVersion
     //
     // We simplify things a by figuring out the full package version and
     // then parsing it to provide information that is used in the build.
-	public BuildVersion(ISetupContext context, BuildParameters parameters)
+	public BuildVersion(ISetupContext context, BuildSettings settings)
 	{
         _context = context;
-        _parameters = parameters;
+        _settings = settings;
         _gitVersion = context.GitVersion();
 
         BranchName = _gitVersion.BranchName;

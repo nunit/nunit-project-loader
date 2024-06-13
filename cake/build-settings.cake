@@ -10,37 +10,20 @@
 
 using System;
 
-// URLs for uploading packages
-private const string MYGET_PUSH_URL = "https://www.myget.org/F/nunit/api/v2";
-private const string NUGET_PUSH_URL = "https://api.nuget.org/v3/index.json";
-private const string CHOCO_PUSH_URL = "https://push.chocolatey.org/";
-
-// Environment Variable names holding API keys
-private const string MYGET_API_KEY = "MYGET_API_KEY";
-private const string NUGET_API_KEY = "NUGET_API_KEY";
-private const string CHOCO_API_KEY = "CHOCO_API_KEY";
-private const string GITHUB_ACCESS_TOKEN = "GITHUB_ACCESS_TOKEN";
-
-// Pre-release labels that we publish
-private static readonly string[] LABELS_WE_PUBLISH_ON_MYGET = { "dev", "pre" };
-private static readonly string[] LABELS_WE_PUBLISH_ON_NUGET = { "alpha", "beta", "rc" };
-private static readonly string[] LABELS_WE_PUBLISH_ON_CHOCOLATEY = { "alpha", "beta", "rc" };
-private static readonly string[] LABELS_WE_RELEASE_ON_GITHUB = { "alpha", "beta", "rc" };
-
-public class BuildParameters
+public class BuildSettings
 {
 	private ISetupContext _context;
 	private BuildSystem _buildSystem;
 
-	public static BuildParameters Create(ISetupContext context)
+	public static BuildSettings Create(ISetupContext context)
 	{
-		var parameters = new BuildParameters(context);
-		//parameters.Validate();
+		var settings = new BuildSettings(context);
+		//settings.Validate();
 
-		return parameters;
+		return settings;
 	}
 
-	private BuildParameters(ISetupContext context)
+	private BuildSettings(ISetupContext context)
 	{
 		_context = context;
 		_buildSystem = context.BuildSystem();

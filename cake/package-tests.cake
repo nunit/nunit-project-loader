@@ -20,13 +20,13 @@ const string DEFAULT_TEST_RESULT_FILE = "TestResult.xml";
 
 public abstract class PackageTester
 {
-	protected BuildParameters _parameters;
+	protected BuildSettings _settings;
 	protected ICakeContext _context;
 
-	public PackageTester(BuildParameters parameters)
+	public PackageTester(BuildSettings settings)
     {
-		_parameters = parameters;
-		_context = parameters.Context;
+		_settings = settings;
+		_context = settings.Context;
 	}
 
 	protected abstract string PackageName { get; }
@@ -39,7 +39,7 @@ public abstract class PackageTester
 
 		foreach (var packageTest in packageTests)
 		{
-			var resultFile = _parameters.ProjectDirectory + DEFAULT_TEST_RESULT_FILE;
+			var resultFile = _settings.ProjectDirectory + DEFAULT_TEST_RESULT_FILE;
 
 			foreach (var consoleVersion in packageTest.TestConsoleVersions)
 			{
@@ -55,7 +55,7 @@ public abstract class PackageTester
 
 				try
 				{
-					var result = new ActualResult(_parameters.ProjectDirectory + DEFAULT_TEST_RESULT_FILE);
+					var result = new ActualResult(_settings.ProjectDirectory + DEFAULT_TEST_RESULT_FILE);
 					var report = new PackageTestReport(packageTest, consoleVersion, result);
 					reporter.AddReport(report);
 
@@ -86,7 +86,7 @@ public abstract class PackageTester
     {
 		bool isNetCoreRunner = consoleVersion.StartsWith("NetCore.");
 
-		string runnerDir = _parameters.ToolsDirectory + $"NUnit.ConsoleRunner.{consoleVersion}/tools/";
+		string runnerDir = _settings.ToolsDirectory + $"NUnit.ConsoleRunner.{consoleVersion}/tools/";
 		if (isNetCoreRunner) runnerDir += "net6.0/";
 
 		var runner = runnerDir + "nunit3-console.exe";
@@ -127,18 +127,18 @@ public abstract class PackageTester
 
 public class NuGetPackageTester : PackageTester
 {
-    public NuGetPackageTester(BuildParameters parameters) : base(parameters) { }
+    public NuGetPackageTester(BuildSettings settings) : base(settings) { }
 
-	protected override string PackageName => _parameters.NuGetPackageName;
-	protected override string PackageUnderTest => _parameters.NuGetPackage;
-	public override string InstallDirectory => _parameters.NuGetInstallDirectory;
+	protected override string PackageName => _settings.NuGetPackageName;
+	protected override string PackageUnderTest => _settings.NuGetPackage;
+	public override string InstallDirectory => _settings.NuGetInstallDirectory;
 }
 
 public class ChocolateyPackageTester : PackageTester
 {
-    public ChocolateyPackageTester(BuildParameters parameters) : base(parameters) { }
+    public ChocolateyPackageTester(BuildSettings settings) : base(settings) { }
 
-	protected override string PackageName => _parameters.ChocolateyPackageName;
-	protected override string PackageUnderTest => _parameters.ChocolateyPackage;
-	public override string InstallDirectory => _parameters.ChocolateyInstallDirectory;
+	protected override string PackageName => _settings.ChocolateyPackageName;
+	protected override string PackageUnderTest => _settings.ChocolateyPackage;
+	public override string InstallDirectory => _settings.ChocolateyInstallDirectory;
 }

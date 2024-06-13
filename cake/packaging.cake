@@ -25,22 +25,22 @@ static readonly Uri MAILING_LIST_URL = new Uri("https://groups.google.com/forum/
 // BUILD NUGET PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public void BuildNuGetPackage(BuildParameters parameters)
+public void BuildNuGetPackage(BuildSettings settings)
 {
 		var content = new List<NuSpecContent>();
-		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" });
-		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "nunit_256.png" });
-		content.Add(new NuSpecContent { Source = parameters.ProjectDirectory + "nunit-project-loader.addins", Target = "tools" });
-		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools/net20" });
-		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit.engine.api.dll", Target = "tools/net20" });
-		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net6.0/nunit-project-loader.dll", Target = "tools/net6.0" });
-		content.Add(new NuSpecContent { Source = parameters.OutputDirectory + "net6.0/nunit.engine.api.dll", Target = "tools/net6.0" });
+		content.Add(new NuSpecContent { Source = settings.ProjectDirectory + "LICENSE.txt" });
+		content.Add(new NuSpecContent { Source = settings.ProjectDirectory + "nunit_256.png" });
+		content.Add(new NuSpecContent { Source = settings.ProjectDirectory + "nunit-project-loader.addins", Target = "tools" });
+		content.Add(new NuSpecContent { Source = settings.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools/net20" });
+		content.Add(new NuSpecContent { Source = settings.OutputDirectory + "net20/nunit.engine.api.dll", Target = "tools/net20" });
+		content.Add(new NuSpecContent { Source = settings.OutputDirectory + "net6.0/nunit-project-loader.dll", Target = "tools/net6.0" });
+		content.Add(new NuSpecContent { Source = settings.OutputDirectory + "net6.0/nunit.engine.api.dll", Target = "tools/net6.0" });
 
 	NuGetPack(
 		new NuGetPackSettings()
 		{
 			Id = NUGET_ID,
-			Version = parameters.PackageVersion,
+			Version = settings.PackageVersion,
 			Title = TITLE,
 			Authors = AUTHORS,
 			Owners = OWNERS,
@@ -53,7 +53,7 @@ public void BuildNuGetPackage(BuildParameters parameters)
 			Copyright = COPYRIGHT,
 			ReleaseNotes = RELEASE_NOTES,
 			Tags = TAGS,
-			OutputDirectory = parameters.PackageDirectory,
+			OutputDirectory = settings.PackageDirectory,
 			KeepTemporaryNuSpecFile = false,
 			Files = content
 		});
@@ -63,22 +63,22 @@ public void BuildNuGetPackage(BuildParameters parameters)
 // BUILD CHOCOLATEY PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public void BuildChocolateyPackage(BuildParameters parameters)
+public void BuildChocolateyPackage(BuildSettings settings)
 {
     var content = new List<ChocolateyNuSpecContent>();
-    content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt", Target = "tools" });
-    content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" });
-	content.Add(new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "nunit-project-loader.addins", Target = "tools" });
-	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools/net20" });
-	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit.engine.api.dll", Target = "tools/net20" });
-	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net6.0/nunit-project-loader.dll", Target = "tools/net6.0" });
-	content.Add(new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net6.0/nunit.engine.api.dll", Target = "tools/net6.0" });
+    content.Add(new ChocolateyNuSpecContent { Source = settings.ProjectDirectory + "LICENSE.txt", Target = "tools" });
+    content.Add(new ChocolateyNuSpecContent { Source = settings.ProjectDirectory + "VERIFICATION.txt", Target = "tools" });
+	content.Add(new ChocolateyNuSpecContent { Source = settings.ProjectDirectory + "nunit-project-loader.addins", Target = "tools" });
+	content.Add(new ChocolateyNuSpecContent { Source = settings.OutputDirectory + "net20/nunit-project-loader.dll", Target = "tools/net20" });
+	content.Add(new ChocolateyNuSpecContent { Source = settings.OutputDirectory + "net20/nunit.engine.api.dll", Target = "tools/net20" });
+	content.Add(new ChocolateyNuSpecContent { Source = settings.OutputDirectory + "net6.0/nunit-project-loader.dll", Target = "tools/net6.0" });
+	content.Add(new ChocolateyNuSpecContent { Source = settings.OutputDirectory + "net6.0/nunit.engine.api.dll", Target = "tools/net6.0" });
 
     ChocolateyPack(
 		new ChocolateyPackSettings()
 		{
 			Id = CHOCO_ID,
-			Version = parameters.PackageVersion,
+			Version = settings.PackageVersion,
 			Title = TITLE,
 			Authors = AUTHORS,
 			Owners = OWNERS,
@@ -96,8 +96,8 @@ public void BuildChocolateyPackage(BuildParameters parameters)
 			MailingListUrl = MAILING_LIST_URL,
 			ReleaseNotes = RELEASE_NOTES,
 			Tags = TAGS,
-				//Language = "en-US",
-				OutputDirectory = parameters.PackageDirectory,
+			//Language = "en-US",
+			OutputDirectory = settings.PackageDirectory,
 			Files = content
 		});
 }
