@@ -25,23 +25,54 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{1E689680-AB9D-497E-8FC3-B541A9A24EEC}"
-	ProjectSection(SolutionItems) = preProject
-		cake\constants.cake = cake\constants.cake
-		cake\local-targets.cake = cake\local-targets.cake
-		cake\package-checks.cake = cake\package-checks.cake
-		cake\package-tests.cake = cake\package-tests.cake
-		cake\packaging.cake = cake\packaging.cake
-		cake\parameters.cake = cake\parameters.cake
-		cake\test-reports.cake = cake\test-reports.cake
-		cake\test-results.cake = cake\test-results.cake
-		cake\utilities.cake = cake\utilities.cake
-		cake\versioning.cake = cake\versioning.cake
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-1", "src\test-lib-1\test-lib-1.csproj", "{1FA6F840-F225-4597-80AE-2C78B466D9C6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-2", "src\test-lib-2\test-lib-2.csproj", "{7808DEA9-FB13-47FC-823F-DC78C1057061}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "recipe", "recipe", "{7EE5FBD2-CD4B-4FB0-9F36-29665955E8BE}"
+	ProjectSection(SolutionItems) = preProject
+		recipe\banner.cake = recipe\banner.cake
+		recipe\build-settings.cake = recipe\build-settings.cake
+		recipe\builder.cake = recipe\builder.cake
+		recipe\chocolatey-package.cake = recipe\chocolatey-package.cake
+		recipe\command-line-options.cake = recipe\command-line-options.cake
+		recipe\constants.cake = recipe\constants.cake
+		recipe\dotnet.cake = recipe\dotnet.cake
+		recipe\extending.cake = recipe\extending.cake
+		recipe\headers.cake = recipe\headers.cake
+		recipe\help-messages.cake = recipe\help-messages.cake
+		recipe\known-extensions.cake = recipe\known-extensions.cake
+		recipe\nuget-package.cake = recipe\nuget-package.cake
+		recipe\package-checks.cake = recipe\package-checks.cake
+		recipe\package-reference.cake = recipe\package-reference.cake
+		recipe\package-definition.cake = recipe\package-definition.cake
+		recipe\package-test.cake = recipe\package-test.cake
+		recipe\publishing.cake = recipe\publishing.cake
+		recipe\setup.cake = recipe\setup.cake
+		recipe\task-builders.cake = recipe\task-builders.cake
+		recipe\task-definitions.cake = recipe\task-definitions.cake
+		recipe\test-reports.cake = recipe\test-reports.cake
+		recipe\test-results.cake = recipe\test-results.cake
+		recipe\test-runners.cake = recipe\test-runners.cake
+		recipe\tools.cake = recipe\tools.cake
+		recipe\unit-testing.cake = recipe\unit-testing.cake
+		recipe\utilities.cake = recipe\utilities.cake
+		recipe\versioning.cake = recipe\versioning.cake
+		recipe\zip-package.cake = recipe\zip-package.cake
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{6C381491-0062-4276-B884-86A6A175FFF5}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\nunit-project-loader.legacy.addins = nuget\nunit-project-loader.legacy.addins
+		nuget\nunit-project-loader.nuspec = nuget\nunit-project-loader.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{2DA8DF86-18D3-4832-970C-A0B26498B93D}"
+	ProjectSection(SolutionItems) = preProject
+		choco\nunit-project-loader.legacy.addins = choco\nunit-project-loader.legacy.addins
+		choco\nunit-project-loader.nuspec = choco\nunit-project-loader.nuspec
+		choco\VERIFICATION.txt = choco\VERIFICATION.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,7 +101,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1E689680-AB9D-497E-8FC3-B541A9A24EEC} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{7EE5FBD2-CD4B-4FB0-9F36-29665955E8BE} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{6C381491-0062-4276-B884-86A6A175FFF5} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{2DA8DF86-18D3-4832-970C-A0B26498B93D} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B07C6102-6B2F-4FC3-9F17-FCD093128F6D}
