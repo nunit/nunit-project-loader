@@ -85,11 +85,11 @@ public static class BuildSettings
     // the solution found in the root directory provided there is only one. 
 	private static string DeduceSolutionFile()			
 	{
-		if (System.IO.File.Exists(Title + ".sln"))
+		if (SIO.File.Exists(Title + ".sln"))
 			return Title + ".sln";
 
-		var files = System.IO.Directory.GetFiles(ProjectDirectory, "*.sln");
-		if (files.Length == 1 && System.IO.File.Exists(files[0]))
+		var files = SIO.Directory.GetFiles(ProjectDirectory, "*.sln");
+		if (files.Length == 1 && SIO.File.Exists(files[0]))
             return files[0];
 
         return null;

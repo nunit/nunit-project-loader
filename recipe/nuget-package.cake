@@ -31,7 +31,7 @@ public class NuGetPackage : PackageDefinition
     // The file name of this package, including extension
     public override string PackageFileName => $"{PackageId}.{PackageVersion}.nupkg";
     // The file name of any symbol package, including extension
-    public override string SymbolPackageName => System.IO.Path.ChangeExtension(PackageFileName, ".snupkg");
+    public override string SymbolPackageName => SIO.Path.ChangeExtension(PackageFileName, ".snupkg");
     // The directory into which this package is installed
     public override string PackageInstallDirectory => BuildSettings.NuGetTestDirectory;
     // The directory used to contain results of package tests for this package

@@ -7,7 +7,7 @@ public static class Tools
 {
 	public static DirectoryPath FindInstalledTool(string packageId)
 	{
-		if (System.IO.Directory.Exists(BuildSettings.ToolsDirectory + packageId))
+		if (SIO.Directory.Exists(BuildSettings.ToolsDirectory + packageId))
 			return BuildSettings.ToolsDirectory + packageId;
 
 		foreach(var dir in BuildSettings.Context.GetDirectories(BuildSettings.ToolsDirectory + $"{packageId}.*"))
