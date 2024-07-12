@@ -206,30 +206,30 @@ public abstract class PackageDefinition
 		//    _context.Information("Deleted directory " + dirPath.GetDirectoryName());
         //}
 
-        //(TestRunner as InstallableTestRunner)?.Install(PackageInstallDirectory);
-        var testRunnerSource = TestRunnerSource ?? new TestRunnerSource((TestRunner)TestRunner);
-        // Preinstall all runners known to the source
-        foreach (InstallableTestRunner runner in testRunnerSource.AllRunners)
-            if (runner != null)
-                InstallRunner(runner);
+        // Package was defined with either a TestRunnerSource or a single TestRunner. In either
+        // case, these will all be package test runners and may or may not require installation.
+        var defaultRunners = TestRunnerSource ?? new TestRunnerSource((TestRunner)TestRunner);
+
+        // Preinstall all runners requiring installation
+        InstallRunners(defaultRunners.PackageTestRunners);
 
         foreach (var packageTest in PackageTests)
         {
-            // Use runners from the test if provided, otherwise the package test source
-            var runners = testRunnerSource.PackageTestRunners;
-            if (packageTest.SelectedRunners != null)
-            {
-                runners = packageTest.SelectedRunners;
-                foreach (InstallableTestRunner runner in runners)
-                    if (runner != null)
-                        InstallRunner(runner);
-            }
+            if (packageTest.Level > BuildSettings.PackageTestLevel)
+                continue;
 
+            InstallExtensions(packageTest.ExtensionsNeeded);
+            InstallRunners(packageTest.TestRunners);
+
+            // Use runners from the test if provided, otherwise the default runners
+            var runners = packageTest.TestRunners.Length > 0 ? packageTest.TestRunners : defaultRunners.PackageTestRunners;
+            
             foreach (var runner in runners)
             {
+                Console.WriteLine(runner.Version);
                 var testResultDir = $"{PackageResultDirectory}/{packageTest.Name}/";
                 var resultFile = testResultDir + "TestResult.xml";
-            
+
                 Banner.Display(packageTest.Description);
 
 			    _context.CreateDirectory(testResultDir);
@@ -273,10 +273,24 @@ public abstract class PackageDefinition
         if (hadErrors)
             throw new Exception("One or more package tests had errors!");
     }
+    
+    private void InstallExtensions(ExtensionSpecifier[] extensionsNeeded)
+    {
+        foreach (ExtensionSpecifier extension in extensionsNeeded)
+            extension.InstallExtension(this);
+    }
+
+    private void InstallRunners(IEnumerable<IPackageTestRunner> runners)
+    {
+        // Install any runners needing installation
+        foreach (var runner in runners)
+            if (runner is InstallableTestRunner)
+                InstallRunner((InstallableTestRunner)runner);
+    }
 
     private void InstallRunner(InstallableTestRunner runner)
     {
-        runner?.Install(PackageInstallDirectory);
+        runner.Install(PackageInstallDirectory);
 
 		// We are using nuget packages for the runner, so it won't normally recognize
 		// chocolatey extensions. We add an extra addins file for that purpose.

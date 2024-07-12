@@ -65,7 +65,7 @@ public abstract class TestRunner : ITestRunner
 			return Context.StartProcess("dotnet", processSettings);
         else
 			return Context.StartProcess(executablePath, processSettings);
-	}
+    }
 }
 
 /// <Summary>
@@ -73,17 +73,10 @@ public abstract class TestRunner : ITestRunner
 /// </Summary>
 public abstract class InstallableTestRunner : TestRunner
 {
-	private string _installDirectoryName;
-
-	// location where user requested install
-	private DirectoryPath _installPath;
-
 	protected InstallableTestRunner(string packageId, string version)
 	{
 		PackageId = packageId;
 		Version = version;
-		
-		_installDirectoryName = $"{packageId}.{version}";
 	}
 
 	protected abstract FilePath ExecutableRelativePath { get; }
@@ -91,20 +84,21 @@ public abstract class InstallableTestRunner : TestRunner
 	// Path under tools directory where package would be installed by Cake #tool directive.
 	// NOTE: When used to run unit tests, a #tool directive is required. If derived package
 	// is only used for package tests, it is optional.
-	protected DirectoryPath ToolInstallDirectory => BuildSettings.ToolsDirectory + _installDirectoryName; 
+	protected DirectoryPath ToolInstallDirectory => BuildSettings.ToolsDirectory + $"{PackageId}.{Version}"; 
 	protected bool IsInstalledAsTool =>
 		ToolInstallDirectory != null && Context.DirectoryExists(ToolInstallDirectory);
+	
 	protected DirectoryPath InstallDirectory;
 
-	public FilePath ExecutablePath => _installPath.CombineWithFilePath(ExecutableRelativePath);
+	public FilePath ExecutablePath => InstallDirectory.CombineWithFilePath(ExecutableRelativePath);
 
 	public void Install(DirectoryPath installDirectory)
 	{
-		_installPath = installDirectory.Combine(_installDirectoryName);
+		InstallDirectory = installDirectory.Combine($"{PackageId}.{Version}");
 
 		// If the runner package is already installed as a cake tool, we just copy it
 		if (IsInstalledAsTool)
-			Context.CopyDirectory(ToolInstallDirectory, _installPath);
+			Context.CopyDirectory(ToolInstallDirectory, InstallDirectory);
 		// Otherwise, we install it to the requested location
 		else
 			Context.NuGetInstall(
@@ -113,17 +107,23 @@ public abstract class InstallableTestRunner : TestRunner
 	}
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// TEST RUNNER SOURCE
+/////////////////////////////////////////////////////////////////////////////
+
+/// <Summary>
+/// TestRunnerSource is a provider of TestRunners. It is used when the tests
+/// are to be run under multiple TestRunners rather than just one.
+/// </Summary>
 public class TestRunnerSource
 {
-	public TestRunnerSource(TestRunner defaultRunner, params TestRunner[] moreRunners)
+	public TestRunnerSource(TestRunner runner1, params TestRunner[] moreRunners)
 	{
-		DefaultRunner = defaultRunner;
-		AllRunners.Add(defaultRunner);
+		AllRunners.Add(runner1);
 		AllRunners.AddRange(moreRunners);
 	}
 
 	public List<TestRunner> AllRunners { get; } = new List<TestRunner>();
-	public TestRunner DefaultRunner { get; }
 
 	public IEnumerable<IUnitTestRunner> UnitTestRunners
 	{
@@ -143,8 +143,8 @@ public class TestRunnerSource
 // For NUnitLite tests, the test is run directly
 public class NUnitLiteRunner : TestRunner, IUnitTestRunner
 {
-	public int RunUnitTest(FilePath testPath) =>
-		RunTest(testPath, BuildSettings.UnitTestArguments);
+    public int RunUnitTest(FilePath testPath) =>
+        RunTest(testPath, BuildSettings.UnitTestArguments);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -205,7 +205,7 @@ public class AgentRunner : TestRunner, IPackageTestRunner
     private string _stdExecutable;
     private string _x86Executable;
 
-	private FilePath _executablePath;
+    private FilePath _executablePath;
 
 	public AgentRunner(string stdExecutable, string x86Executable = null)
 	{

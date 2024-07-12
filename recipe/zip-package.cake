@@ -12,7 +12,7 @@ public class ZipPackage : PackageDefinition
         PackageType.Zip, 
         id, 
         source, 
-        testRunner: testRunner, 
+        testRunner: testRunner,
         testRunnerSource: testRunnerSource,
         checks: checks, 
         tests: tests) 

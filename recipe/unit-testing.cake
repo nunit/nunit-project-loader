@@ -17,7 +17,7 @@ public static class UnitTesting
 
         _context.Information($"Located {unitTests.Count} unit test assemblies.");
         var errors = new List<string>();
-
+    
         var runner = BuildSettings.UnitTestRunner ?? new NUnitLiteRunner();
     
         foreach (var testPath in unitTests)

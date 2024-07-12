@@ -310,6 +310,7 @@ public static class BuildSettings
         Console.WriteLine("UnitTestRunner:            " + UnitTestRunner?.GetType().Name ?? "<NUnitLiteRunner>");
 
 		Console.WriteLine("\nPACKAGING");
+		Console.WriteLine("PackageTestLevel:          " + PackageTestLevel);
 		Console.WriteLine("MyGetPushUrl:              " + MyGetPushUrl);
 		Console.WriteLine("NuGetPushUrl:              " + NuGetPushUrl);
 		Console.WriteLine("ChocolateyPushUrl:         " + ChocolateyPushUrl);
