@@ -1,4 +1,4 @@
 # Inclusion of this addins file allows older versions of the console runner
 # to locate extensions in subdirectories of the tools directory.
-net20/nunit-project-loader.dll
-net60/nunit-project-loader.dll
+net462/nunit-project-loader.dll
+net6.0/nunit-project-loader.dll

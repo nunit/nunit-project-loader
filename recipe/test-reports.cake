@@ -1,21 +1,16 @@
-// ***********************************************************************
-// Copyright (c) Charlie Poole and TestCentric GUI contributors.
-// Licensed under the MIT License. See LICENSE.txt in root directory.
-// ***********************************************************************
-
 public class PackageTestReport
 {
 	public PackageTest Test;
-	public string ConsoleVersion;
 	public ActualResult Result;
+	public ITestRunner Runner;
 	public List<string> Errors;
 	public List<string> Warnings;
 
-	public PackageTestReport(PackageTest test, string consoleVersion, ActualResult actualResult)
+	public PackageTestReport(PackageTest test, ActualResult actualResult, ITestRunner runner = null)
 	{
 		Test = test;
-		ConsoleVersion = consoleVersion;
 		Result = actualResult;
+		Runner = runner;
 		Errors = new List<string>();
 		Warnings = new List<string>();
 
@@ -42,53 +37,57 @@ public class PackageTestReport
 			var expected = expectedAssemblies[i];
 			var actual = actualAssemblies[i];
 
-			if (expected.Name != actual.Name)
-				Errors.Add($"   Expected: {expected.Name} But was: { actual.Name}");
-			else if (actual.Runtime == null)
-				Warnings.Add($"Unable to determine actual runtime used for {expected.Name}");
-			else if (!expected.Runtime.StartsWith(actual.Runtime))
-				Errors.Add($"   Assembly {actual.Name} Expected: {expected.Runtime} But was: {actual.Runtime}");
+			if (expected.AssemblyName != actual.AssemblyName)
+				Errors.Add($"   Expected: {expected.AssemblyName} But was: { actual.AssemblyName}");
+			else if (runner == null || runner.PackageId == "NUnit.ConsoleRunner.NetCore")
+			{
+				if (actual.Runtime == null)
+					Warnings.Add($"Unable to determine actual runtime used for {expected.AssemblyName}");
+				else if (expected.Runtime != actual.Runtime)
+					Errors.Add($"   Assembly {actual.AssemblyName} Expected: {expected.Runtime} But was: {actual.Runtime}");
+			}
         }
 
 		for (int i = actualAssemblies.Length; i < expectedAssemblies.Length; i++)
-			Errors.Add($"   Assembly {expectedAssemblies[i].Name} was not found");
+			Errors.Add($"   Assembly {expectedAssemblies[i].AssemblyName} was not found");
 
 		for (int i = expectedAssemblies.Length; i < actualAssemblies.Length; i++)
-			Errors.Add($"   Found unexpected assembly {actualAssemblies[i].Name}");
+			Errors.Add($"   Found unexpected assembly {actualAssemblies[i].AssemblyName}");
 	}
 
-	public PackageTestReport(PackageTest test, string consoleVersion, Exception ex)
+	public PackageTestReport(PackageTest test, Exception ex, ITestRunner runner = null)
 	{
 		Test = test;
-		ConsoleVersion = consoleVersion;
 		Result = null;
 		Errors = new List<string>();
 		Errors.Add($"     {ex.Message}");
+		Runner = runner;
 	}
 
-	public void Display(int index)
+	public void Display(int index, TextWriter writer)
 	{
-		Console.WriteLine();
-		Console.WriteLine($"{index}. {Test.Description}");
-		Console.WriteLine($"   ConsoleVersion: {ConsoleVersion}");
-		Console.WriteLine($"   Args: {Test.Arguments}");
-		Console.WriteLine();
+		writer.WriteLine();
+		writer.WriteLine($"{index}. {Test.Description}");
+		if (Runner != null)
+		    writer.WriteLine($"   Runner: {Runner.PackageId} {Runner.Version}");
+		writer.WriteLine($"   Args: {Test.Arguments}");
+		writer.WriteLine();
 
 		foreach (var error in Errors)
-			Console.WriteLine(error);
+			writer.WriteLine(error);
 
 		if (Errors.Count == 0)
 		{
-			Console.WriteLine("   SUCCESS: Test Result matches expected result!");
+			writer.WriteLine("   SUCCESS: Test Result matches expected result!");
 		}
 		else
 		{
-			Console.WriteLine();
-			Console.WriteLine("   ERROR: Test Result not as expected!");
+			writer.WriteLine();
+			writer.WriteLine("   ERROR: Test Result not as expected!");
 		}
 
 		foreach (var warning in Warnings)
-			Console.WriteLine("   WARNING: " + warning);
+			writer.WriteLine("   WARNING: " + warning);
 	}
 
 	// File level errors, like missing or mal-formatted files, need to be highlighted
@@ -148,15 +147,15 @@ public class ResultReporter
 		_reports.Add(report);
 	}
 
-	public bool ReportResults()
+	public bool ReportResults(TextWriter writer)
 	{
-		Console.WriteLine("\n=================================================="); ;
-		Console.WriteLine($"Test Results for {_packageName}");
-		Console.WriteLine("=================================================="); ;
+		writer.WriteLine("\n=================================================="); ;
+		writer.WriteLine($"Test Results for {_packageName}");
+		writer.WriteLine("=================================================="); ;
 
-		Console.WriteLine("\nTest Environment");
-		Console.WriteLine($"   OS Version: {Environment.OSVersion.VersionString}");
-		Console.WriteLine($"  CLR Version: {Environment.Version}\n");
+		writer.WriteLine("\nTest Environment");
+		writer.WriteLine($"   OS Version: {Environment.OSVersion.VersionString}");
+		writer.WriteLine($"  CLR Version: {Environment.Version}\n");
 
 		int index = 0;
 		bool hasErrors = false;
@@ -164,7 +163,7 @@ public class ResultReporter
 		foreach (var report in _reports)
 		{
 			hasErrors |= report.Errors.Count > 0;
-			report.Display(++index);
+			report.Display(++index, writer);
 		}
 
 		return hasErrors;

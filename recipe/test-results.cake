@@ -1,10 +1,7 @@
-// ***********************************************************************
-// Copyright (c) Charlie Poole and TestCentric GUI contributors.
-// Licensed under the MIT License. See LICENSE.txt in root directory.
-// ***********************************************************************
-
 // This file contains classes used to interpret the result XML that is
 // produced by test runs of the GUI.
+
+using System.Xml;
 
 public abstract class ResultSummary
 {
@@ -36,13 +33,13 @@ public class ExpectedResult : ResultSummary
 
 public class ExpectedAssemblyResult
 {
-	public ExpectedAssemblyResult(string name, string expectedRuntime)
+	public ExpectedAssemblyResult(string name, string expectedRuntime = null)
 	{
-		Name = name;
+		AssemblyName = name;
 		Runtime = expectedRuntime;
 	}
 
-	public string Name { get; }
+	public string AssemblyName { get; }
 	public string Runtime { get; }
 }
 
@@ -66,10 +63,13 @@ public class ActualResult : ResultSummary
 		Skipped = IntAttribute(Xml, "skipped");
 
 		var assemblies = new List<ActualAssemblyResult>();
-		var engineVersion = new Version(GetAttribute(Xml, "engine-version"));
+		//var engineVersion = new Version(GetAttribute(Xml, "engine-version"));
 
 		foreach (XmlNode node in Xml.SelectNodes("//test-suite[@type='Assembly']"))
-			assemblies.Add(new ActualAssemblyResult(node, engineVersion));
+			assemblies.Add(new ActualAssemblyResult(node));
+
+		//foreach (XmlNode node in Xml.SelectNodes("//test-suite[@type='Assembly']"))
+		//	assemblies.Add(new ActualAssemblyResult(node, engineVersion));
 
 		Assemblies = assemblies.ToArray();
 	}
@@ -92,6 +92,30 @@ public class ActualResult : ResultSummary
 	}
 }
 
+public class ActualAssemblyResult
+{
+	public ActualAssemblyResult(XmlNode xml)
+    {
+		AssemblyName = xml.Attributes["name"]?.Value;
+
+		//var env = xml.SelectSingleNode("environment");
+		var settings = xml.SelectSingleNode("settings");
+
+		// If TargetRuntimeFramework setting is not present, the Runner will probably crash
+		var runtimeSetting = settings?.SelectSingleNode("setting[@name='TargetRuntimeFramework']");
+		Runtime = runtimeSetting?.Attributes["value"]?.Value;
+
+		var agentSetting = settings?.SelectSingleNode("setting[@name='SelectedAgentName']");
+		AgentName = agentSetting?.Attributes["value"]?.Value;
+	}
+
+	public string AssemblyName { get; }
+	public string AgentName { get; }
+
+	public string Runtime { get; }
+}
+
+#if false
 public class ActualAssemblyResult
 {
 	public ActualAssemblyResult(XmlNode xml, Version engineVersion)
@@ -141,3 +165,4 @@ public class ActualAssemblyResult
 		return null;
 	}
 }
+#endif

@@ -3,9 +3,9 @@
     
 	<PropertyGroup>
         <!-- If adding/updating TargetFrameworks, also update build.cake -->
-        <!-- Even though we don't support running tests build for netcoreapp2.1 yet, we still build for it -->
         <TargetFrameworks>net462;net6.0</TargetFrameworks>
         <Configurations>Debug;Release</Configurations>
+		<OutputType>Exe</OutputType>
         <RootNamespace>NUnit.Engine.Tests</RootNamespace>
         <AssemblyName>nunit-project-loader.tests</AssemblyName>
         <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
@@ -15,6 +15,7 @@
 	<ItemGroup>
 		<PackageReference Include="nunit.engine.api" Version="3.11.1" />
 		<PackageReference Include="NUnit" Version="3.14.0" />
+		<PackageReference Include="NUnitLite" Version="3.14.0" />
 	</ItemGroup>
   
 	<ItemGroup>

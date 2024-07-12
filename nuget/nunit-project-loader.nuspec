@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>NUnit.Extension.NUnitProjectLoader</id>
+    <title>NUnit Project Loader</title>
+    <version>$version$</version>
+    <authors>Charlie Poole</authors>
+    <owners>Charlie Poole</owners>
+	  <summary>NUnit engine extension that allows running NUnit projects, which have a file extension of '.nunit'.</summary>
+	  <description>This extension allows the engine to run NUnit projects, which have a file extension of '.nunit'.</description>
+	  <license type="file">LICENSE.txt</license>
+    <projectUrl>https://nunit.org</projectUrl>
+    <repository type="git" url="https://github.com/nunit/nunit-project-loader"/>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <icon>nunit_256.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>https://github.com/nunit/nunit-project-loader/releases</releaseNotes>
+    <language>en-US</language>
+    <tags>nunit test testing tdd engine extension</tags>
+    <copyright>Copyright (c) 2016-2024 Charlie Poole</copyright>
+  </metadata>
+  <files>
+    <file src="../../LICENSE.txt" />
+    <file src="../../nunit_256.png" />
+	<file src="../../nuget/nunit-project-loader.legacy.addins" target="tools" />
+	<file src="net462/nunit-project-loader.dll" target="tools/net462" />
+	<file src="net462/nunit.engine.api.dll" target="tools/net462" />
+	<file src="net6.0/nunit-project-loader.dll" target="tools/net6.0" />
+	<file src="net6.0/nunit.engine.api.dll" target="tools/net6.0" />
+  </files>
+</package>
