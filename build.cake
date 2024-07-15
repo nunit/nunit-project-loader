@@ -3,8 +3,9 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.18.0-dev00037
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
 
-// Load scripts 
+// Load the recipe 
 #load nuget:?package=NUnit.Cake.Recipe&version=1.0.0-dev00001
+// Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Initialize BuildSettings
