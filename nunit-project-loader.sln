@@ -29,38 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-1", "src\test-lib-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-2", "src\test-lib-2\test-lib-2.csproj", "{7808DEA9-FB13-47FC-823F-DC78C1057061}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "recipe", "recipe", "{7EE5FBD2-CD4B-4FB0-9F36-29665955E8BE}"
-	ProjectSection(SolutionItems) = preProject
-		recipe\banner.cake = recipe\banner.cake
-		recipe\build-settings.cake = recipe\build-settings.cake
-		recipe\builder.cake = recipe\builder.cake
-		recipe\chocolatey-package.cake = recipe\chocolatey-package.cake
-		recipe\command-line-options.cake = recipe\command-line-options.cake
-		recipe\constants.cake = recipe\constants.cake
-		recipe\dotnet.cake = recipe\dotnet.cake
-		recipe\extending.cake = recipe\extending.cake
-		recipe\headers.cake = recipe\headers.cake
-		recipe\help-messages.cake = recipe\help-messages.cake
-		recipe\known-extensions.cake = recipe\known-extensions.cake
-		recipe\nuget-package.cake = recipe\nuget-package.cake
-		recipe\package-checks.cake = recipe\package-checks.cake
-		recipe\package-reference.cake = recipe\package-reference.cake
-		recipe\package-definition.cake = recipe\package-definition.cake
-		recipe\package-test.cake = recipe\package-test.cake
-		recipe\publishing.cake = recipe\publishing.cake
-		recipe\setup.cake = recipe\setup.cake
-		recipe\task-builders.cake = recipe\task-builders.cake
-		recipe\task-definitions.cake = recipe\task-definitions.cake
-		recipe\test-reports.cake = recipe\test-reports.cake
-		recipe\test-results.cake = recipe\test-results.cake
-		recipe\test-runners.cake = recipe\test-runners.cake
-		recipe\tools.cake = recipe\tools.cake
-		recipe\unit-testing.cake = recipe\unit-testing.cake
-		recipe\utilities.cake = recipe\utilities.cake
-		recipe\versioning.cake = recipe\versioning.cake
-		recipe\zip-package.cake = recipe\zip-package.cake
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{6C381491-0062-4276-B884-86A6A175FFF5}"
 	ProjectSection(SolutionItems) = preProject
 		nuget\nunit-project-loader.legacy.addins = nuget\nunit-project-loader.legacy.addins
@@ -101,7 +69,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{7EE5FBD2-CD4B-4FB0-9F36-29665955E8BE} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
 		{6C381491-0062-4276-B884-86A6A175FFF5} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
 		{2DA8DF86-18D3-4832-970C-A0B26498B93D} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
 	EndGlobalSection
