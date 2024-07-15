@@ -1,14 +1,11 @@
-#tool NuGet.CommandLine&version=6.9.1
-#tool nuget:?package=GitVersion.CommandLine&version=5.6.3
-#tool nuget:?package=GitReleaseManager&version=0.17.0
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
 #tool nuget:?package=NUnit.ConsoleRUnner&version=3.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.18.0-dev00037
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
 
 // Load scripts 
-#load recipe/*.cake
+#load nuget:?package=NUnit.Cake.Recipe&version=1.0.0-dev00001
+//#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -16,12 +13,8 @@ BuildSettings.Initialize(
     "NUnit Project Loader",
     "nunit-project-loader",
     solutionFile: "nunit-project-loader.sln",
-	//unitTestRunner: new NUnitLiteRunner(),
-	//unitTests: "**/*.Tests.exe");
-	unitTestRunner: new NUnitConsoleRunner("3.17.0"),
-	unitTests: "**/*.Tests.dll");
-	//unitTestRunner: new NUnitNetCoreConsoleRunner("3.18.0-dev00037"),
-	//unitTests: "**/*.Tests.dll");
+	unitTestRunner: new NUnitLiteRunner(),
+	unitTests: "**/*.Tests.exe");
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE TESTS
@@ -100,11 +93,6 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
 		tests: PackageTests,
 		testRunnerSource: new TestRunnerSource(new NUnitConsoleRunner("3.17.0"), new NUnitConsoleRunner("3.15.5"), new NUnitConsoleRunner("3.18.0-dev00037"))
-		//testRunner: new NUnitConsoleRunner("3.17.0")
-		//testRunner: new NUnitConsoleRunner("3.15.5")
-		//testRunner: new NUnitConsoleRunner("3.18.0-dev00037")
-		//testRunner: new NUnitNetCoreConsoleRunner("3.18.0-dev00037")
-		//testRunner: new EngineExtensionTestRunner()
 	));
 
 //////////////////////////////////////////////////////////////////////
@@ -121,10 +109,6 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
 		tests: PackageTests,
 		testRunnerSource: new TestRunnerSource(new NUnitConsoleRunner("3.17.0"), new NUnitConsoleRunner("3.15.5"), new NUnitConsoleRunner("3.18.0-dev00037"))
-		//testRunner: new NUnitConsoleRunner("3.17.0")
-		//testRunner: new NUnitConsoleRunner("3.15.5")
-		//testRunner: new NUnitConsoleRunner("3.18.0-dev00037")
-		//testRunner: new NUnitNetCoreConsoleRunner("3.18.0-dev00037")
 	));
 
 //////////////////////////////////////////////////////////////////////
