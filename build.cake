@@ -4,7 +4,8 @@
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
 
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.0.0-dev00001
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.4
+
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -23,60 +24,66 @@ BuildSettings.Initialize(
 
 PackageTest[] PackageTests = new PackageTest[]
 {
-	new PackageTest (
-		1, "SingleAssembly_AllTestsPass",
-		"Project with one assembly, all tests pass",
-		"../../PassingAssembly.nunit",
-		new ExpectedResult("Passed") {
+	new PackageTest (1, "SingleAssembly_AllTestsPass")
+	{
+        Description = "Project with one assembly, all tests pass",
+        Arguments = "../../PassingAssembly.nunit",
+        ExpectedResult = new ExpectedResult("Passed") {
 			Total = 4, Passed = 4, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
-			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-4.6.2") } } ),
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-4.6.2") } }
+	},
 
-	new PackageTest (
-		1, "SingleAssembly_SomeTestsFail",
-		"Project with one assembly, some failures",
-		"../../FailingAssembly.nunit",
-		new ExpectedResult("Failed") {
+	new PackageTest (1, "SingleAssembly_SomeTestsFail")
+	{
+        Description = "Project with one assembly, some failures",
+        Arguments = "../../FailingAssembly.nunit",
+        ExpectedResult = new ExpectedResult("Failed") {
 			Total = 9, Passed = 4, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
-			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } } ),
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } }
+	},
 
-	new PackageTest	(
-		1, "BothAssembliesTogether",
-		"Project with both assemblies",
-		"../../BothAssemblies.nunit",
-		new ExpectedResult("Failed") {
+	new PackageTest (1, "BothAssembliesTogether")
+	{
+        Description = "Project with both assemblies",
+        Arguments = "../../BothAssemblies.nunit",
+        ExpectedResult = new ExpectedResult("Failed") {
 			Total = 13, Passed = 8, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
 			Assemblies = new[] {
 				new ExpectedAssemblyResult("test-lib-1.dll", "net-4.6.2"),
-				new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } } ),
+				new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } }
+	},
 
-	new PackageTest (
-		1, "SingleNetCoreAssembly_AllTestsPass",
-		"Project with one .NET Core assembly, all tests pass",
-		"../../PassingAssemblyNetCore.nunit",
-		new ExpectedResult("Passed") {
+	new PackageTest (1, "SingleNetCoreAssembly_AllTestsPass")
+	{
+        Description = "Project with one .NET Core assembly, all tests pass",
+        Arguments = "../../PassingAssemblyNetCore.nunit",
+        ExpectedResult = new ExpectedResult("Passed") {
 			Total = 4, Passed = 4, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
 			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0") } },
-		new IPackageTestRunner[] { (IPackageTestRunner)new NUnitNetCoreConsoleRunner("3.18.0-dev00037") } ),
+		TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.18.0-dev00037") }
+	},
 
-	new PackageTest (
-		1, "SingleNetCoreAssembly_SomeTestsFail",
-		"Project with one .NET Core assembly, some failures",
-		"../../FailingAssemblyNetCore.nunit",
-		new ExpectedResult("Failed") {
+	new PackageTest (1, "SingleNetCoreAssembly_SomeTestsFail")
+	{
+        Description = "Project with one .NET Core assembly, some failures",
+        Arguments = "../../FailingAssemblyNetCore.nunit",
+        ExpectedResult = new ExpectedResult("Failed") {
 			Total = 9, Passed = 4, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
 			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } },
-		new IPackageTestRunner[] { (IPackageTestRunner)new NUnitNetCoreConsoleRunner("3.18.0-dev00037") } ),
+		TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.18.0-dev00037") }
+	},
 
-	new PackageTest (
-		1, "BothNetCoreAssembliesTogether",
-		"Project with both .NET Core assemblies",
-		"../../BothAssembliesNetCore.nunit",
-		new ExpectedResult("Failed") {
+	new PackageTest (1, "BothNetCoreAssembliesTogether")
+	{
+        Description = "Project with both .NET Core assemblies",
+        Arguments = "../../BothAssembliesNetCore.nunit",
+        ExpectedResult = new ExpectedResult("Failed") {
 			Total = 13, Passed = 8, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
 			Assemblies = new[] {
 				new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0"),
 				new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } },
-		new IPackageTestRunner[] { (IPackageTestRunner)new NUnitNetCoreConsoleRunner("3.18.0-dev00037") } )
+		TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.18.0-dev00037") }
+	}
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -93,7 +100,11 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net462").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"),
 			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
 		tests: PackageTests,
-		testRunnerSource: new TestRunnerSource(new NUnitConsoleRunner("3.17.0"), new NUnitConsoleRunner("3.15.5"), new NUnitConsoleRunner("3.18.0-dev00037"))
+		testRunners: new IPackageTestRunner[] {
+			new NUnitConsoleRunner("3.17.0"),
+			new NUnitConsoleRunner("3.15.5"),
+			new NUnitConsoleRunner("3.18.0-dev00037")
+		}
 	));
 
 //////////////////////////////////////////////////////////////////////
@@ -109,7 +120,11 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net462").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"),
 			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
 		tests: PackageTests,
-		testRunnerSource: new TestRunnerSource(new NUnitConsoleRunner("3.17.0"), new NUnitConsoleRunner("3.15.5"), new NUnitConsoleRunner("3.18.0-dev00037"))
+		testRunners: new IPackageTestRunner[] {
+			new NUnitConsoleRunner("3.17.0"),
+			new NUnitConsoleRunner("3.15.5"),
+			new NUnitConsoleRunner("3.18.0-dev00037")
+		}
 	));
 
 //////////////////////////////////////////////////////////////////////
