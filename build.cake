@@ -1,7 +1,19 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.19.2
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.18.3
 #tool nuget:?package=NUnit.ConsoleRUnner&version=3.17.0
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.18.0-dev00037
-#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.19.2
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.3
+
+// Define runners to be used for testing packages
+static readonly IPackageTestRunner[] PACKAGE_TEST_RUNNERS = new IPackageTestRunner[] {
+	new NUnitConsoleRunner("3.19.2"),
+	new NUnitConsoleRunner("3.18.3"),
+	new NUnitConsoleRunner("3.17.0"),
+	new NUnitConsoleRunner("3.15.5")
+	//new NUnit3NetCoreConsoleRunner("3.19.2"),
+	//new NUnit3NetCoreConsoleRunner("3.18.3"),
+};
 
 // Load the recipe 
 #load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.4
@@ -59,8 +71,8 @@ PackageTest[] PackageTests = new PackageTest[]
         Arguments = "../../PassingAssemblyNetCore.nunit",
         ExpectedResult = new ExpectedResult("Passed") {
 			Total = 4, Passed = 4, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
-			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0") } },
-		TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.18.0-dev00037") }
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0") } }
+		//TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.19.2") }
 	},
 
 	new PackageTest (1, "SingleNetCoreAssembly_SomeTestsFail")
@@ -69,8 +81,8 @@ PackageTest[] PackageTests = new PackageTest[]
         Arguments = "../../FailingAssemblyNetCore.nunit",
         ExpectedResult = new ExpectedResult("Failed") {
 			Total = 9, Passed = 4, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
-			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } },
-		TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.18.0-dev00037") }
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } }
+		//TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.19.2") }
 	},
 
 	new PackageTest (1, "BothNetCoreAssembliesTogether")
@@ -81,8 +93,8 @@ PackageTest[] PackageTests = new PackageTest[]
 			Total = 13, Passed = 8, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
 			Assemblies = new[] {
 				new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0"),
-				new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } },
-		TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.18.0-dev00037") }
+				new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } }
+		//TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnit3NetCoreConsoleRunner("3.19.2") }
 	}
 };
 
@@ -101,9 +113,12 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
 		tests: PackageTests,
 		testRunners: new IPackageTestRunner[] {
+			new NUnitConsoleRunner("3.19.2"),
+			new NUnitConsoleRunner("3.18.3"),
 			new NUnitConsoleRunner("3.17.0"),
-			new NUnitConsoleRunner("3.15.5"),
-			new NUnitConsoleRunner("3.18.0-dev00037")
+			new NUnitConsoleRunner("3.15.5")
+			//new NUnit3NetCoreConsoleRunner("3.19.2"),
+			//new NUnit3NetCoreConsoleRunner("3.18.3"),
 		}
 	));
 
@@ -121,9 +136,12 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
 		tests: PackageTests,
 		testRunners: new IPackageTestRunner[] {
+			//new NUnitConsoleRunner("3.19.2"),
+			new NUnitConsoleRunner("3.18.3"),
 			new NUnitConsoleRunner("3.17.0"),
-			new NUnitConsoleRunner("3.15.5"),
-			new NUnitConsoleRunner("3.18.0-dev00037")
+			new NUnitConsoleRunner("3.15.5")
+			//new NUnit3NetCoreConsoleRunner("3.19.2"),
+			//new NUnit3NetCoreConsoleRunner("3.18.3"),
 		}
 	));
 
