@@ -42,6 +42,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{2DA8DF86
 		choco\VERIFICATION.txt = choco\VERIFICATION.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{329888D6-1DBB-4B70-890A-9B08C87303CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7250A27B-1B35-4A6A-B256-50155A2175ED}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\NUnitProjectLoader.CI.yml = .github\workflows\NUnitProjectLoader.CI.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +78,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{6C381491-0062-4276-B884-86A6A175FFF5} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
 		{2DA8DF86-18D3-4832-970C-A0B26498B93D} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{329888D6-1DBB-4B70-890A-9B08C87303CE} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{7250A27B-1B35-4A6A-B256-50155A2175ED} = {329888D6-1DBB-4B70-890A-9B08C87303CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B07C6102-6B2F-4FC3-9F17-FCD093128F6D}
