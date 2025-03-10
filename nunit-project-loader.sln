@@ -9,19 +9,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-project-loader.tests"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3B28CF0C-D613-4971-9D8F-00C960C656E2}"
 	ProjectSection(SolutionItems) = preProject
-		.travis.yml = .travis.yml
-		appveyor.yml = appveyor.yml
 		BothAssemblies.nunit = BothAssemblies.nunit
+		BothAssembliesNetCore.nunit = BothAssembliesNetCore.nunit
 		build.cake = build.cake
 		build.ps1 = build.ps1
 		build.sh = build.sh
 		FailingAssembly.nunit = FailingAssembly.nunit
+		FailingAssemblyNetCore.nunit = FailingAssemblyNetCore.nunit
 		GitReleaseManager.yaml = GitReleaseManager.yaml
 		GitVersion.yml = GitVersion.yml
 		LICENSE.txt = LICENSE.txt
 		nunit-project-loader.addins = nunit-project-loader.addins
 		nunit-project-loader.nuspec = nunit-project-loader.nuspec
 		PassingAssembly.nunit = PassingAssembly.nunit
+		PassingAssemblyNetCore.nunit = PassingAssemblyNetCore.nunit
 		README.md = README.md
 	EndProjectSection
 EndProject
