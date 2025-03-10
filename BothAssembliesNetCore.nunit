@@ -1,6 +1,7 @@
 <NUnitProject>
   <Settings processModel="Default" domainUsage="Default" />
   <Config name="Release" appbase="bin/Release">
-    <assembly path="net462/test-lib-2.dll" />
+    <assembly path="net6.0/test-lib-1.dll" />
+    <assembly path="net6.0/test-lib-2.dll" />
   </Config>
 </NUnitProject>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) Charlie Poole and Contributors. MIT License - see LICENSE.txt
+
+using System;
 using System.Collections.Generic;
 
 namespace NUnit.Common

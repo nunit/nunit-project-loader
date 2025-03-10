@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- If adding/updating TargetFrameworks, also update build.cake -->
-    <TargetFramework>net20</TargetFramework>
+    <TargetFrameworks>net462;net6.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <OutputType>Library</OutputType>
     <RootNamespace>TestLib2</RootNamespace>
@@ -12,6 +12,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit" Version="4.2.2" />
   </ItemGroup>
 </Project>

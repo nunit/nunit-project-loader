@@ -1,16 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net20</TargetFrameworks>
-    <Configurations>Debug;Release</Configurations>
-    <OutputType>Library</OutputType>
-    <RootNamespace>NUnit.Engine.Services.ProjectLoaders</RootNamespace>
-    <AssemblyName>nunit-project-loader</AssemblyName>
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="nunit.engine.api" Version="4.0.0-dev00102" />
-  </ItemGroup>
+  
+	<PropertyGroup>
+        <TargetFrameworks>net462;net6.0</TargetFrameworks>
+        <Configurations>Debug;Release</Configurations>
+        <OutputType>Library</OutputType>
+        <RootNamespace>NUnit.Engine.Services.ProjectLoaders</RootNamespace>
+        <AssemblyName>nunit-project-loader</AssemblyName>
+        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    </PropertyGroup>
+	
+    <ItemGroup>
+        <PackageReference Include="NUnit.Engine.Api" Version="4.0.0-alpha.31" />
+	    <PackageReference Include="NUnit.Extensibility.Api" Version="4.0.0-alpha.31" />
+    </ItemGroup>
+	
 </Project>

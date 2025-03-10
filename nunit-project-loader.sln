@@ -13,16 +13,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.travis.yml = .travis.yml
 		appveyor.yml = appveyor.yml
 		BothAssemblies.nunit = BothAssemblies.nunit
+		BothAssembliesNetCore.nunit = BothAssembliesNetCore.nunit
 		build.cake = build.cake
 		build.ps1 = build.ps1
 		build.sh = build.sh
 		CHANGES.md = CHANGES.md
 		FailingAssembly.nunit = FailingAssembly.nunit
+		FailingAssemblyNetCore.nunit = FailingAssemblyNetCore.nunit
 		GitReleaseManager.yaml = GitReleaseManager.yaml
 		GitVersion.yml = GitVersion.yml
 		LICENSE.txt = LICENSE.txt
 		nunit-project-loader.nuspec = nunit-project-loader.nuspec
 		PassingAssembly.nunit = PassingAssembly.nunit
+		PassingAssemblyNetCore.nunit = PassingAssemblyNetCore.nunit
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -42,6 +45,19 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-1", "src\test-lib-1\test-lib-1.csproj", "{1FA6F840-F225-4597-80AE-2C78B466D9C6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "test-lib-2", "src\test-lib-2\test-lib-2.csproj", "{7808DEA9-FB13-47FC-823F-DC78C1057061}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{81002CF6-F13F-4BCE-A3A0-C4C3FA801108}"
+	ProjectSection(SolutionItems) = preProject
+		choco\nunit-project-loader.legacy.addins = choco\nunit-project-loader.legacy.addins
+		choco\nunit-project-loader.nuspec = choco\nunit-project-loader.nuspec
+		choco\VERIFICATION.txt = choco\VERIFICATION.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{F262724B-1179-4D9E-8DFF-2C5D8043591F}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\nunit-project-loader.legacy.addins = nuget\nunit-project-loader.legacy.addins
+		nuget\nunit-project-loader.nuspec = nuget\nunit-project-loader.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +87,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1E689680-AB9D-497E-8FC3-B541A9A24EEC} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{81002CF6-F13F-4BCE-A3A0-C4C3FA801108} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
+		{F262724B-1179-4D9E-8DFF-2C5D8043591F} = {3B28CF0C-D613-4971-9D8F-00C960C656E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B07C6102-6B2F-4FC3-9F17-FCD093128F6D}
