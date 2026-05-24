@@ -1,29 +1,10 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-alpha.31
-#tool dotnet:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-alpha.31
-
-// NOTE: Because of permission issues in installing the chocolatey
-// versions of the NUnit console runner, all tests use the nuget
-// packages. The test runners included in the recipe adjust the
-// search path for extensions accordingly.
-
-// StandardRunners is used as the default setting for our tests,
-// since the standard runner can execute all of them
-var StandardRunners = new IPackageTestRunner[] {
-	new NUnitConsoleRunner("NUnit.ConsoleRunner", "4.0.0-alpha.31"),
-};
-
-var NetCoreRunners = new IPackageTestRunner[] {
-    new NUnit4DotNetRunner("NUnit.ConsoleRunner.NetCore", "4.0.0-alpha.31"),
-};
-
-// For .NET Core tests, we override the default and use AllRunners,
-// since both the standard and netcore runners can execute them.
-var AllRunners =  new List<IPackageTestRunner>( StandardRunners.Concat(NetCoreRunners) ).ToArray();
+#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-beta.2.2
+#tool dotnet:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-beta.2.2
 
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.5
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.3.1
 // Comment out above line and uncomment below for local tests of recipe changes
-//#load ../NUnit.Cake.Recipe/recipe/*.cake
+//#load ../NUnit.Cake.Recipe/src/NUnit.Cake.Recipe/content/*.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -35,78 +16,75 @@ BuildSettings.Initialize(
 	unitTestRunner: new NUnitLiteRunner(),
 	unitTests: "**/*.Tests.exe");
 
+IPackageTestRunner StandardRunner = new NUnitConsoleRunner("NUnit.ConsoleRunner", "4.0.0-beta.2.2");
+IPackageTestRunner DotNetRunner = new NUnit4DotNetRunner("NUnit.ConsoleRunner.NetCore", "4.0.0-beta.2.2");
+
 //////////////////////////////////////////////////////////////////////
 // PACKAGE TESTS
 //////////////////////////////////////////////////////////////////////
 
-var SingleAssembly_AllTestsPass = new PackageTest (1, "SingleAssembly_AllTestsPass")
+PackageTest[] packageTests = new PackageTest[]
 {
-	Description = "Project with one assembly, all tests pass",
-	Arguments = "../../PassingAssembly.nunit",
-	ExpectedResult = new ExpectedResult("Passed") {
-		Total = 4, Passed = 4, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
-		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-4.6.2") } }
-};
+	new PackageTest (1, "SingleAssembly_AllTestsPass")
+	{
+		Description = "Project with one assembly, all tests pass",
+		Arguments = "../../PassingAssembly.nunit",
+		ExpectedResult = new ExpectedResult("Passed") {
+			Total = 4, Passed = 4, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "net-4.6.2") } },
+		TestRunner = StandardRunner
+    },
 
-var SingleAssembly_SomeTestsFail = new PackageTest (1, "SingleAssembly_SomeTestsFail")
-{
-    Description = "Project with one assembly, some failures",
-    Arguments = "../../FailingAssembly.nunit",
-    ExpectedResult = new ExpectedResult("Failed") {
-		Total = 9, Passed = 4, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
-		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } }
-};
+	new PackageTest (1, "SingleAssembly_SomeTestsFail")
+	{
+		Description = "Project with one assembly, some failures",
+		Arguments = "../../FailingAssembly.nunit",
+		ExpectedResult = new ExpectedResult("Failed") {
+			Total = 9, Passed = 4, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } },
+		TestRunner = StandardRunner
+	},
 
-var BothAssembliesTogether = new PackageTest (1, "BothAssembliesTogether")
-{
-    Description = "Project with both assemblies",
-    Arguments = "../../BothAssemblies.nunit",
-    ExpectedResult = new ExpectedResult("Failed") {
-		Total = 13, Passed = 8, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
-		Assemblies = new[] {
-			new ExpectedAssemblyResult("test-lib-1.dll", "net-4.6.2"),
-			new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } }
-};
+	new PackageTest (1, "BothAssembliesTogether")
+	{
+		Description = "Project with both assemblies",
+		Arguments = "../../BothAssemblies.nunit",
+		ExpectedResult = new ExpectedResult("Failed") {
+			Total = 13, Passed = 8, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
+			Assemblies = new[] {
+				new ExpectedAssemblyResult("test-lib-1.dll", "net-4.6.2"),
+				new ExpectedAssemblyResult("test-lib-2.dll", "net-4.6.2") } },
+			TestRunner = StandardRunner
+    },
 
-var SingleNetCoreAssembly_AllTestsPass = new PackageTest (1, "SingleNetCoreAssembly_AllTestsPass")
-{
-    Description = "Project with one .NET Core assembly, all tests pass",
-    Arguments = "../../PassingAssemblyNetCore.nunit",
-    ExpectedResult = new ExpectedResult("Passed") {
-		Total = 4, Passed = 4, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
-		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0") } },
-	TestRunners = AllRunners
-};
+	new PackageTest (1, "SingleNetCoreAssembly_AllTestsPass")
+	{
+		Description = "Project with one .NET Core assembly, all tests pass",
+		Arguments = "../../PassingAssemblyNetCore.nunit",
+		ExpectedResult = new ExpectedResult("Passed") {
+			Total = 4, Passed = 4, Failed = 0, Warnings = 0, Inconclusive = 0, Skipped = 0,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0") } }
+	},
 
-var SingleNetCoreAssembly_SomeTestsFail = new PackageTest (1, "SingleNetCoreAssembly_SomeTestsFail")
-{
-    Description = "Project with one .NET Core assembly, some failures",
-    Arguments = "../../FailingAssemblyNetCore.nunit",
-    ExpectedResult = new ExpectedResult("Failed") {
-		Total = 9, Passed = 4, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
-		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } },
-	TestRunners = AllRunners
-};
+	new PackageTest (1, "SingleNetCoreAssembly_SomeTestsFail")
+	{
+		Description = "Project with one .NET Core assembly, some failures",
+		Arguments = "../../FailingAssemblyNetCore.nunit",
+		ExpectedResult = new ExpectedResult("Failed") {
+			Total = 9, Passed = 4, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
+			Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } }
+	},
 
-var BothNetCoreAssembliesTogether = new PackageTest (1, "BothNetCoreAssembliesTogether")
-{
-    Description = "Project with both .NET Core assemblies",
-    Arguments = "../../BothAssembliesNetCore.nunit",
-    ExpectedResult = new ExpectedResult("Failed") {
-		Total = 13, Passed = 8, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
-		Assemblies = new[] {
-			new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0"),
-			new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } },
-	TestRunners = AllRunners
-};
-
-var AllTests = new PackageTest[] {
-	SingleAssembly_AllTestsPass,
-	SingleAssembly_SomeTestsFail,
-	BothAssembliesTogether,
-	SingleNetCoreAssembly_AllTestsPass,
-	SingleNetCoreAssembly_SomeTestsFail,
-	BothNetCoreAssembliesTogether
+	new PackageTest (1, "BothNetCoreAssembliesTogether")
+	{
+		Description = "Project with both .NET Core assemblies",
+		Arguments = "../../BothAssembliesNetCore.nunit",
+		ExpectedResult = new ExpectedResult("Failed") {
+			Total = 13, Passed = 8, Failed = 2, Warnings = 0, Inconclusive = 1, Skipped = 2,
+			Assemblies = new[] {
+				new ExpectedAssemblyResult("test-lib-1.dll", "netcore-6.0"),
+				new ExpectedAssemblyResult("test-lib-2.dll", "netcore-6.0") } }
+	}
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -116,15 +94,15 @@ var AllTests = new PackageTest[] {
 BuildSettings.Packages.Add(
 	new NuGetPackage(
 		"NUnit.Extension.NUnitProjectLoader",
-		"nuget/nunit-project-loader.nuspec",
+		source: "nuget/nunit-project-loader.nuspec",
 		checks: new PackageCheck[] {
 			HasFiles("LICENSE.txt", "nunit_256.png"),
 			HasDirectory("tools").WithFile("nunit-project-loader.legacy.addins"),
 			HasDirectory("tools/net462").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"),
-			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
-		tests: AllTests,
-		testRunners: StandardRunners
-	));
+			HasDirectory("tools/net8.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
+		tests: packageTests,
+		testRunners: [ StandardRunner, DotNetRunner]
+    ));
 
 //////////////////////////////////////////////////////////////////////
 // CHOCOLATEY PACKAGE
@@ -133,13 +111,13 @@ BuildSettings.Packages.Add(
 BuildSettings.Packages.Add(
 	new ChocolateyPackage(
 		"nunit-extension-nunit-project-loader",
-		"choco/nunit-project-loader.nuspec",
+		source: "choco/nunit-project-loader.nuspec",
 		checks: new PackageCheck[] {
 			HasDirectory("tools").WithFiles("LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.legacy.addins"),
 			HasDirectory("tools/net462").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"),
-			HasDirectory("tools/net6.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
-		tests: AllTests,
-		testRunners: StandardRunners
+			HasDirectory("tools/net8.0").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll") },
+		tests: packageTests,
+		testRunners: [ StandardRunner, DotNetRunner]
 	));
 
 //////////////////////////////////////////////////////////////////////

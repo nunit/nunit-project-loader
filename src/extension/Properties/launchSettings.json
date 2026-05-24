@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "nunit-project-loader": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Users\\charlie\\dev\\NUnit\\nunit-project-loader\\packages\\tests\\nuget\\NUnit.ConsoleRunner.4.0.0-beta.2.1\\tools\\nunit-console.exe",
+      "commandLineArgs": "..\\..\\..\\PassingAssembly.nunit --wait"
+    }
+  }
+}

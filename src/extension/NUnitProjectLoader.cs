@@ -6,7 +6,7 @@ using NUnit.Extensibility;
 
 namespace NUnit.Engine.Services.ProjectLoaders
 {
-    [Extension(EngineVersion = "4.0")]
+    [Extension(HostVersion = "4.0")]
     [ExtensionProperty("FileExtension", ".nunit")]
     public class NUnitProjectLoader : IProjectLoader
     {

@@ -73,6 +73,12 @@ namespace NUnit.Engine.Services.ProjectLoaders
                 XmlNode configNode = GetConfigNode(configName);
                 
                 string basePath = GetBasePathForConfig(configNode);
+                string configFile =
+                    configNode.GetAttribute(CONFIGFILE_ATTR) ??
+                    Path.ChangeExtension(ProjectPath, ".config");
+                string binpath = configNode.GetAttribute(BINPATH_ATTR);
+                string binpathtype = configNode.GetAttribute(BINPATHTYPE_ATTR);
+                string runtime = configNode.GetAttribute(RUNTIME_ATTR);
 
                 foreach (XmlNode node in configNode.SelectNodes(ASSEMBLY_NODE))
                 {
@@ -82,9 +88,15 @@ namespace NUnit.Engine.Services.ProjectLoaders
                     package.AddSubPackage(assembly);
                 }
 
-                var settings = GetSettingsForConfig(configNode);
-                foreach (var key in settings.Keys)
-                    package.Settings.Add(key, settings[key]);
+                if (basePath != ProjectPath)
+                    package.Settings.Add(SettingDefinitions.BasePath.WithValue(basePath));
+                package.Settings.Add(SettingDefinitions.ConfigurationFile.WithValue(configFile));
+                if (binpath != null)
+                    package.Settings.Add(SettingDefinitions.PrivateBinPath.WithValue(binpath));
+                if (binpathtype != null && binpathtype.ToLower() == BINPATH_AUTO)
+                    package.Settings.Add(SettingDefinitions.AutoBinPath.WithValue(true));
+                if (runtime != null)
+                    package.Settings.Add(SettingDefinitions.RequestedRuntimeFramework.WithValue(runtime));
             }
 
             return package;
