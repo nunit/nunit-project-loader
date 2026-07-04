@@ -1,7 +1,13 @@
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.22.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.21.1
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.20.2
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.19.2
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.18.3
 #tool nuget:?package=NUnit.ConsoleRUnner&version=3.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.22.0
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.21.1
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.20.2
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.19.2
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.3
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.17.0
@@ -15,14 +21,20 @@
 // StandardRunners is used as the default setting for our tests,
 // since the standard runner can execute all of them
 var StandardRunners = new IPackageTestRunner[] {
-	new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.19.2"),
+    new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.22.0"),
+    new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.21.1"),
+    new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.20.2"),
+    new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.19.2"),
 	new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.18.3"),
 	new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.17.0"),
 	new NUnitConsoleRunner("NUnit.ConsoleRunner", "3.15.5"),
 };
 
 var NetCoreRunners = new IPackageTestRunner[] {
-	new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.19.2", "tools/net8.0/any/nunit3-console.exe"),
+    new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.22.0", "tools/net8.0/any/nunit3-console.exe"),
+    new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.21.1", "tools/net8.0/any/nunit3-console.exe"),
+    new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.20.2", "tools/net8.0/any/nunit3-console.exe"),
+    new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.19.2", "tools/net8.0/any/nunit3-console.exe"),
 	new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.18.3", "tools/net6.0/any/nunit3-console.exe"),
 	new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.17.0", "tools/net6.0/any/nunit3-console.exe"),
 	new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "3.15.5", "tools/net6.0/any/nunit3-console.exe")
@@ -33,7 +45,7 @@ var NetCoreRunners = new IPackageTestRunner[] {
 var AllRunners =  new List<IPackageTestRunner>( StandardRunners.Concat(NetCoreRunners) ).ToArray();
 
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.5
+#load nuget:?package=NUnit.Cake.Recipe&version=1.6.0
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -127,7 +139,7 @@ var AllTests = new PackageTest[] {
 BuildSettings.Packages.Add(
 	new NuGetPackage(
 		"NUnit.Extension.NUnitProjectLoader",
-		"nuget/nunit-project-loader.nuspec",
+		source: "nuget/nunit-project-loader.nuspec",
 		checks: new PackageCheck[] {
 			HasFiles("LICENSE.txt", "nunit_256.png"),
 			HasDirectory("tools").WithFile("nunit-project-loader.legacy.addins"),
@@ -144,7 +156,7 @@ BuildSettings.Packages.Add(
 BuildSettings.Packages.Add(
 	new ChocolateyPackage(
 		"nunit-extension-nunit-project-loader",
-		"choco/nunit-project-loader.nuspec",
+		source: "choco/nunit-project-loader.nuspec",
 		checks: new PackageCheck[] {
 			HasDirectory("tools").WithFiles("LICENSE.txt", "VERIFICATION.txt", "nunit-project-loader.legacy.addins"),
 			HasDirectory("tools/net462").WithFiles("nunit-project-loader.dll", "nunit.engine.api.dll"),
