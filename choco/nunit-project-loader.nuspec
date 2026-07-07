@@ -29,7 +29,7 @@
     <file src = "nunit-project-loader.legacy.addins" target = "tools" />
 	<file src="$BIN_DIR$net462/nunit-project-loader.dll" target="tools/net462" />
 	<file src="$BIN_DIR$net462/nunit.engine.api.dll" target="tools/net462" />
-	<file src="$BIN_DIR$net6.0/nunit-project-loader.dll" target="tools/net6.0" />
-	<file src="$BIN_DIR$net6.0/nunit.engine.api.dll" target="tools/net6.0" />
+	<file src="$BIN_DIR$net8.0/nunit-project-loader.dll" target="tools/net8.0" />
+	<file src="$BIN_DIR$net8.0/nunit.engine.api.dll" target="tools/net8.0" />
   </files>
 </package>

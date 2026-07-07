@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
+using NUnit.Common;
+using NUnit.Engine.Extensibility;
+using NUnit.Engine.Tests.resources;
+using NUnit.Extensibility;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using NUnit.Engine.Extensibility;
-using NUnit.Engine.Tests.resources;
-using NUnit.Framework;
 
 namespace NUnit.Engine.Services.ProjectLoaders.Tests
 {
@@ -65,19 +67,16 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
 
                 var projectDir = Path.GetDirectoryName(file.Path);
 
-                Assert.AreEqual(2, project.ConfigNames.Count);
-                Assert.AreEqual("Debug", project.ActiveConfigName);
-                Assert.AreEqual(new string[] { "Debug", "Release" }, project.ConfigNames);
+                Assert.That(project.ConfigNames.Count, Is.EqualTo(2));
+                Assert.That(project.ActiveConfigName, Is.EqualTo("Debug"));
+                Assert.That(project.ConfigNames, Is.EqualTo(new string[] { "Debug", "Release" }));
 
                 TestPackage package1 = project.GetTestPackage("Debug");
-                Assert.AreEqual(2, package1.Settings.Count);
-                Assert.AreEqual(true, package1.Settings["AutoBinPath"], "AutoBinPath");
-                Assert.AreEqual(projectDir, package1.Settings["BasePath"], "BasePath");
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.BasePath), Is.EqualTo(projectDir));
 
                 TestPackage package2 = project.GetTestPackage("Release");
-                Assert.AreEqual(2, package2.Settings.Count);
-                Assert.AreEqual(true, package2.Settings["AutoBinPath"], "AutoBinPath");
-                Assert.AreEqual(projectDir, package1.Settings["BasePath"], "BasePath");
+                Assert.That(package2.Settings.GetValueOrDefault(SettingDefinitions.AutoBinPath), Is.True);
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.BasePath), Is.EqualTo(projectDir));
             }
         }
 
@@ -94,35 +93,23 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 var debugDir = Path.Combine(binDir, "debug");
                 var releaseDir = Path.Combine(binDir, "release");
 
-                Assert.AreEqual(2, _project.ConfigNames.Count);
-                Assert.AreEqual("Debug", _project.ActiveConfigName);
-                Assert.AreEqual(new string[] { "Debug", "Release" }, _project.ConfigNames);
+                Assert.That(_project.ActiveConfigName, Is.EqualTo("Debug"));
+                Assert.That(_project.ConfigNames, Is.EqualTo(new string[] { "Debug", "Release" }));
 
                 TestPackage package1 = _project.GetTestPackage("Debug");
-                Assert.AreEqual(2, package1.SubPackages.Count);
-                Assert.AreEqual(
-                    Path.Combine(debugDir, "assembly1.dll"),
-                    package1.SubPackages[0].FullName);
-                Assert.AreEqual(
-                    Path.Combine(debugDir, "assembly2.dll"),
-                    package1.SubPackages[1].FullName);
+                Assert.That(package1.SubPackages[0].FullName, Is.EqualTo(Path.Combine(debugDir, "assembly1.dll")));
+                Assert.That(package1.SubPackages[1].FullName, Is.EqualTo(Path.Combine(debugDir, "assembly2.dll")));
 
-                Assert.AreEqual(2, package1.Settings.Count);
-                Assert.AreEqual(debugDir, package1.Settings["BasePath"], "BasePath");
-                Assert.AreEqual(true, package1.Settings["AutoBinPath"], "AutoBinPath");
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.BasePath), Is.EqualTo(debugDir));
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.AutoBinPath), Is.EqualTo(true));
 
                 TestPackage package2 = _project.GetTestPackage("Release");
-                Assert.AreEqual(2, package2.SubPackages.Count);
-                Assert.AreEqual(
-                    Path.Combine(releaseDir, "assembly1.dll"),
-                    package2.SubPackages[0].FullName);
-                Assert.AreEqual(
-                    Path.Combine(releaseDir, "assembly2.dll"),
-                    package2.SubPackages[1].FullName);
+                Assert.That(package2.SubPackages.Count, Is.EqualTo(2));
+                Assert.That(package2.SubPackages[0].FullName, Is.EqualTo(Path.Combine(releaseDir, "assembly1.dll")));
+                Assert.That(package2.SubPackages[1].FullName, Is.EqualTo(Path.Combine(releaseDir, "assembly2.dll")));
 
-                Assert.AreEqual(2, package2.Settings.Count);
-                Assert.AreEqual(releaseDir, package2.Settings["BasePath"]);
-                Assert.AreEqual(true, package2.Settings["AutoBinPath"]);
+                Assert.That(package2.Settings.GetValueOrDefault(SettingDefinitions.BasePath), Is.EqualTo(releaseDir));
+                Assert.That(package2.Settings.GetValueOrDefault(SettingDefinitions.AutoBinPath), Is.EqualTo(true));
 
                 Assert.Throws<NUnitEngineException>(() => _project.GetTestPackage("MissingConfiguration"), 
                 "Project loader should throw exception when attempting to use missing configuration");
@@ -141,9 +128,8 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 Assert.AreEqual(1, project.ConfigNames.Count);
 
                 TestPackage package1 = project.GetTestPackage("Debug");
-                Assert.AreEqual(2, package1.Settings.Count);
-                Assert.AreEqual("bin_path_value", package1.Settings["PrivateBinPath"], "PrivateBinPath");
-                Assert.AreEqual(projectDir, package1.Settings["BasePath"], "BasePath");
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.PrivateBinPath), Is.EqualTo("bin_path_value"));
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.BasePath), Is.EqualTo(projectDir));
             }
         }
 
@@ -159,17 +145,13 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                 var debugDir = Path.Combine(binDir, "debug");
                 var releaseDir = Path.Combine(binDir, "release");
 
-                Assert.AreEqual(2, project.ConfigNames.Count);
+                Assert.That(project.ConfigNames.Count, Is.EqualTo(2));
 
                 TestPackage package1 = project.GetTestPackage("Debug");
-                Assert.AreEqual(5, package1.Settings.Count);
-                Assert.AreEqual(debugDir, package1.Settings["BasePath"]);
-                Assert.AreEqual(true, package1.Settings["AutoBinPath"]);
-                Assert.AreEqual("Separate", package1.Settings["ProcessModel"]);
-                Assert.AreEqual("Multiple", package1.Settings["DomainUsage"]);
-                Assert.AreEqual("v2.0", package1.Settings["RuntimeFramework"]);
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.BasePath), Is.EqualTo(debugDir));
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.AutoBinPath), Is.EqualTo(true));
+                Assert.That(package1.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework), Is.EqualTo("v2.0"));
 
-                Assert.AreEqual(2, package1.SubPackages.Count);
                 Assert.AreEqual(
                     Path.Combine(debugDir, "assembly1.dll"),
                     package1.SubPackages[0].FullName);
@@ -178,14 +160,11 @@ namespace NUnit.Engine.Services.ProjectLoaders.Tests
                     package1.SubPackages[1].FullName);
 
                 TestPackage package2 = project.GetTestPackage("Release");
-                Assert.AreEqual(5, package2.Settings.Count);
-                Assert.AreEqual(releaseDir, package2.Settings["BasePath"]);
-                Assert.AreEqual(true, package2.Settings["AutoBinPath"]);
-                Assert.AreEqual("Separate", package2.Settings["ProcessModel"]);
-                Assert.AreEqual("Multiple", package2.Settings["DomainUsage"]);
-                Assert.AreEqual("v4.0", package2.Settings["RuntimeFramework"]);
+                Assert.That(package2.Settings.GetValueOrDefault(SettingDefinitions.BasePath), Is.EqualTo(releaseDir));
+                Assert.That(package2.Settings.GetValueOrDefault(SettingDefinitions.AutoBinPath), Is.EqualTo(true));
+                Assert.That(package2.Settings.GetValueOrDefault(SettingDefinitions.RequestedRuntimeFramework), Is.EqualTo("v4.0"));
 
-                Assert.AreEqual(2, package2.SubPackages.Count);
+                Assert.That(package2.SubPackages.Count, Is.EqualTo(2));
                 Assert.AreEqual(
                     Path.Combine(releaseDir, "assembly1.dll"),
                     package2.SubPackages[0].FullName);

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "nunit-project-loader.tests": {
+      "commandName": "Project",
+      "commandLineArgs": "-test NUnit.Engine.Services.ProjectLoaders"
+    }
+  }
+}

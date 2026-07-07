@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
 using System.IO;
-using NUnit.Common;
+using NUnit.Extensibility;
 using NUnit.Engine.Extensibility;
 
 namespace NUnit.Engine.Services.ProjectLoaders
 {
-    [Extension(Path="/NUnit/Engine/TypeExtensions/IProjectLoader")]
+    [Extension(HostVersion="4.0")]
     [ExtensionProperty("FileExtension", ".nunit")]
     public class NUnitProjectLoader : IProjectLoader
     {

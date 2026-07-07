@@ -23,8 +23,6 @@ namespace NUnit.Engine.Services.ProjectLoaders
         private const string BINPATH_ATTR = "binpath";
         private const string BINPATHTYPE_ATTR = "binpathtype";
         private const string RUNTIME_ATTR = "runtimeFramework";
-        private const string PROCESS_ATTR = "processModel";
-        private const string DOMAIN_ATTR = "domainUsage";
 
         private const string BINPATH_AUTO = "auto";
 
@@ -63,7 +61,8 @@ namespace NUnit.Engine.Services.ProjectLoaders
 
         public TestPackage GetTestPackage(string configName)
         {
-            var package = new TestPackage(ProjectPath);
+            var dummy = new TestPackage();
+            var package = dummy.AddSubPackage(ProjectPath);
             if (configName == null)
                 configName = ActiveConfigName;
 
@@ -72,18 +71,30 @@ namespace NUnit.Engine.Services.ProjectLoaders
                 XmlNode configNode = GetConfigNode(configName);
                 
                 string basePath = GetBasePathForConfig(configNode);
+                string configFile =
+                    configNode.GetAttribute(CONFIGFILE_ATTR) ??
+                    Path.ChangeExtension(ProjectPath, ".config");
+                string binpath = configNode.GetAttribute(BINPATH_ATTR);
+                string binpathtype = configNode.GetAttribute(BINPATHTYPE_ATTR);
+                string runtime = configNode.GetAttribute(RUNTIME_ATTR);
 
                 foreach (XmlNode node in configNode.SelectNodes(ASSEMBLY_NODE))
                 {
                     string assembly = node.GetAttribute(PATH_ATTR);
                     if (basePath != null)
                         assembly = Path.Combine(basePath, assembly);
-                    package.AddSubPackage(new TestPackage(assembly));
+                    package.AddSubPackage(assembly);
                 }
 
-                var settings = GetSettingsForConfig(configNode);
-                foreach (var key in settings.Keys)
-                    package.Settings.Add(key, settings[key]);
+                if (basePath != ProjectPath)
+                    package.Settings.Add(SettingDefinitions.BasePath.WithValue(basePath));
+                package.Settings.Add(SettingDefinitions.ConfigurationFile.WithValue(configFile));
+                if (binpath != null)
+                    package.Settings.Add(SettingDefinitions.PrivateBinPath.WithValue(binpath));
+                if (binpathtype != null && binpathtype.ToLower() == BINPATH_AUTO)
+                    package.Settings.Add(SettingDefinitions.AutoBinPath.WithValue(true));
+                if (runtime != null)
+                    package.Settings.Add(SettingDefinitions.RequestedRuntimeFramework.WithValue(runtime));
             }
 
             return package;
@@ -134,16 +145,6 @@ namespace NUnit.Engine.Services.ProjectLoaders
         internal string RuntimeFramework { get; private set; }
 
         /// <summary>
-        /// The specified process model, or null
-        /// </summary>
-        internal string ProcessModel { get; private set; }
-
-        /// <summary>
-        /// The specified domain usage, or null
-        /// </summary>
-        internal string DomainUsage { get; private set; }
-
-        /// <summary>
         /// The project base path (Appbase)
         /// </summary>
         internal string ProjectBase { get; private set; }
@@ -161,8 +162,6 @@ namespace NUnit.Engine.Services.ProjectLoaders
             if (SettingsNode != null)
             {
                 ActiveConfigName = SettingsNode.GetAttribute(ACTIVECONFIG_ATTR);
-                ProcessModel = SettingsNode.GetAttribute(PROCESS_ATTR);
-                DomainUsage = SettingsNode.GetAttribute(DOMAIN_ATTR);
                 ProjectBase = SettingsNode.GetAttribute(APPBASE_ATTR);
             }
 
@@ -207,39 +206,6 @@ namespace NUnit.Engine.Services.ProjectLoaders
                 configBasePath = Path.Combine(ProjectBase, configBasePath);
 
             return configBasePath;
-        }
-
-        private IDictionary<string, object> GetSettingsForConfig(XmlNode configNode)
-        {
-            var settings = new Dictionary<string, object>();
-
-            string basePath = GetBasePathForConfig(configNode);
-            if (basePath != ProjectPath)
-                settings[RunnerSettings.BasePath] = basePath;
-
-            string configFile = configNode.GetAttribute(CONFIGFILE_ATTR);
-            if (configFile != null)
-                settings[RunnerSettings.ConfigurationFile] = configFile;
-
-            string binpath = configNode.GetAttribute(BINPATH_ATTR);
-            if (binpath != null)
-                settings[RunnerSettings.PrivateBinPath] = binpath;
-
-            string binpathtype = configNode.GetAttribute(BINPATHTYPE_ATTR);
-            if (binpathtype != null && binpathtype.ToLower() == BINPATH_AUTO)
-                settings[RunnerSettings.AutoBinPath] = true;
-
-            string runtime = configNode.GetAttribute(RUNTIME_ATTR);
-            if (runtime != null)
-                settings[RunnerSettings.RuntimeFramework] = runtime;
-
-            if (ProcessModel != null)
-                settings[RunnerSettings.ProcessModel] = ProcessModel;
-
-            if (DomainUsage != null)
-                settings[RunnerSettings.DomainUsage] = DomainUsage;
-
-            return settings;
         }
 
         static readonly char[] PATH_SEPARATORS = new char[] { '/', '\\' };

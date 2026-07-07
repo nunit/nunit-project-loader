@@ -2,16 +2,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- If adding/updating TargetFrameworks, also update build.cake -->
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    <TargetFrameworks>net462;net8.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <OutputType>Library</OutputType>
     <RootNamespace>NUnit.Engine.Services.ProjectLoaders</RootNamespace>
     <AssemblyName>nunit-project-loader</AssemblyName>
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="nunit.engine.api" Version="3.11.1" />
+	  <PackageReference Include="nunit.engine.api" Version="4.0.0-beta.2.2" />
+	  <PackageReference Include="nunit.extensibility.api" Version="4.0.0-beta.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>
