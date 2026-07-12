@@ -1,29 +1,28 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-beta.2.2
-#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-beta.2.2
+#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-beta.2.3
+#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-beta.2.3
 
-// NOTE: Because of permission issues in installing the chocolatey
-// versions of the NUnit console runner, all tests use the nuget
-// packages. The test runners included in the recipe adjust the
-// search path for extensions accordingly.
+// Load the recipe 
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4
+// Comment out above line and uncomment below for local tests of recipe changes
+//#load ../NUnit.Cake.Recipe/src/NUnit.Cake.Recipe/content/*.cake
+
+static readonly ExtensionSpecifier[] AGENTS = [
+    new("NUnit.Extension.Net462PluggableAgent", "nunit-extension-net462-pluggable-agent", "4.1.1"),
+    new("NUnit.Extension.Net80PluggableAgent", "nunit-extension-net80-pluggable-agent", "4.1.1"),
+    new("NUnit.Extension.Net90PluggableAgent", "nunit-extension-net90-pluggable-agent", "4.1.1") ];
 
 // StandardRunners is used as the default setting for our tests,
 // since the standard runner can execute all of them
-var StandardRunners = new IPackageTestRunner[] {
-    new NUnitConsoleRunner("NUnit.ConsoleRunner", "4.0.0-beta.2.2")
-};
+static readonly IPackageTestRunner[] StandardRunners = [
+	new NUnitConsoleRunner("NUnit.ConsoleRunner", "4.0.0-beta.2.3") { Dependencies = AGENTS } ];
 
-var NetCoreRunners = new IPackageTestRunner[] {
-	new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "4.0.0-beta.2.2", "tools/net8.0/any/nunit-netcore-console.dll")
-};
+static readonly IPackageTestRunner[] NetCoreRunners = [
+	new NUnit3NetCoreConsoleRunner("NUnit.ConsoleRunner.NetCore", "4.0.0-beta.2.3",
+		"tools/net8.0/any/nunit-netcore-console.dll") { Dependencies = AGENTS } ];
 
 // For .NET Core tests, we override the default and use AllRunners,
 // since both the standard and netcore runners can execute them.
 var AllRunners =  new List<IPackageTestRunner>( StandardRunners.Concat(NetCoreRunners) ).ToArray();
-
-// Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.3.3
-// Comment out above line and uncomment below for local tests of recipe changes
-//#load ../NUnit.Cake.Recipe/src/NUnit.Cake.Recipe/content/*.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
