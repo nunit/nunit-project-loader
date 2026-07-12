@@ -2,7 +2,7 @@
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-beta.2.3
 
 // Load the recipe 
-#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.4.2
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/src/NUnit.Cake.Recipe/content/*.cake
 
